@@ -36,44 +36,45 @@ After=network.target
 [Service]
 Type=simple
 User=$USER_NAME
+SupplementaryGroups=video input dialout spi i2c gpio
 WorkingDirectory=$INSTALL_DIR
 ExecStart=$INSTALL_DIR/venv/bin/python src/main.py
 Restart=always
 RestartSec=10
-Environment=DISPLAY=:0
+TTYPath=/dev/tty1
+StandardInput=tty
+StandardOutput=tty
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# Configurer l'auto-login
-echo "[INSTALL] Configuration auto-login..."
-sudo systemctl set-default graphical.target
-sudo systemctl enable lightdm.service
+# Configurer pour le mode console avec auto-login
+echo "[INSTALL] Configuration du mode console avec auto-login..."
+sudo systemctl set-default multi-user.target
 
-# Configurer l'auto-login pour l'utilisateur
-sudo mkdir -p /etc/lightdm/lightdm.conf.d/
-sudo tee /etc/lightdm/lightdm.conf.d/12-autologin.conf > /dev/null << EOF
-[Seat:*]
-autologin-user=$USER_NAME
-autologin-user-timeout=0
+# Configurer l'auto-login console
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d/
+sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf > /dev/null << EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $USER_NAME --noclear %I \$TERM
 EOF
 
-# Créer le script de démarrage automatique
-mkdir -p /home/$USER_NAME/.config/autostart
-tee /home/$USER_NAME/.config/autostart/tipsy-elite.desktop > /dev/null << EOF
-[Desktop Entry]
-Type=Application
-Name=Tipsy Elite
-Exec=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/src/main.py
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-EOF
-
-# Ne pas activer le service systemd (on utilise autostart à la place)
-echo "[INSTALL] Configuration du démarrage graphique..."
+# Activer le service et configurer le démarrage
+echo "[INSTALL] Activation du service et configuration du démarrage..."
 sudo systemctl daemon-reload
+sudo systemctl enable tipsy-elite.service
+
+# Ajouter le démarrage automatique dans .bashrc
+if ! grep -q "tipsy-elite" /home/$USER_NAME/.bashrc; then
+    echo "" >> /home/$USER_NAME/.bashrc
+    echo "# Auto-start Tipsy Elite on console login" >> /home/$USER_NAME/.bashrc
+    echo "if [[ \$(tty) == \"/dev/tty1\" ]] && [[ -z \$DISPLAY ]]; then" >> /home/$USER_NAME/.bashrc
+    echo "    cd $INSTALL_DIR" >> /home/$USER_NAME/.bashrc
+    echo "    exec $INSTALL_DIR/venv/bin/python src/main.py" >> /home/$USER_NAME/.bashrc
+    echo "fi" >> /home/$USER_NAME/.bashrc
+fi
 
 # Créer le script de gestion
 echo "[INSTALL] Création des scripts de gestion..."

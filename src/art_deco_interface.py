@@ -637,11 +637,18 @@ class ArtDecoInterface:
         
         # Initialiser pygame
         try:
-            # Configuration pour fonctionner sans écran (headless)
             import os
-            os.environ['SDL_VIDEODRIVER'] = 'dummy'
+            # Configuration pour Raspberry Pi - essayer fbcon d'abord, puis fallback
+            if not os.environ.get('DISPLAY'):
+                os.environ['SDL_VIDEODRIVER'] = 'fbcon'
+                os.environ['SDL_FBDEV'] = '/dev/fb0'
+            
             pygame.init()
             pygame.mixer.init()
+            
+            # Cacher le curseur pour mode kiosk
+            pygame.mouse.set_visible(False)
+            
             logger.info("[OK] Pygame initialisé")
         except Exception as e:
             logger.error(f"[ERROR] Impossible d'initialiser Pygame: {e}")
