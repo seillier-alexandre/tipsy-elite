@@ -17,9 +17,9 @@ from hardware_config import SCREEN_CONFIG
 
 logger = logging.getLogger(__name__)
 
-# Initialisation Pygame
-pygame.init()
-pygame.mixer.init()
+# Initialisation Pygame sera faite dans initialize()
+# pygame.init() - Déplacé dans la méthode initialize()
+# pygame.mixer.init() - Déplacé dans la méthode initialize()
 
 # Configuration écran rond
 SCREEN_WIDTH = SCREEN_CONFIG['width']
@@ -634,6 +634,18 @@ class ArtDecoInterface:
     def initialize(self):
         """Initialise l'interface"""
         logger.info("Initialisation interface Art Déco")
+        
+        # Initialiser pygame
+        try:
+            # Configuration pour fonctionner sans écran (headless)
+            import os
+            os.environ['SDL_VIDEODRIVER'] = 'dummy'
+            pygame.init()
+            pygame.mixer.init()
+            logger.info("[OK] Pygame initialisé")
+        except Exception as e:
+            logger.error(f"[ERROR] Impossible d'initialiser Pygame: {e}")
+            return False
         
         # Charger les données
         self.load_cocktails()
