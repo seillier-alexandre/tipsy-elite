@@ -32,18 +32,34 @@ class GestureEvent:
     timestamp: float
 
 class GestureManager:
-    """Gestionnaire des gestes tactiles pour interface moderne"""
+    """Gestionnaire des gestes tactiles pour interface moderne avec animations fluides"""
     
-    def __init__(self, min_distance: int = 50, min_velocity: float = 200):
+    def __init__(self, min_distance: int = 50, min_velocity: float = 200, screen_width: int = 800):
         self.min_distance = min_distance
         self.min_velocity = min_velocity
+        self.screen_width = screen_width
+        self.min_swipe_threshold = screen_width // 4  # 1/4 de l'écran comme dans Tipsy
+        
         self.touch_start = None
         self.touch_start_time = None
+        self.is_dragging = False
+        self.drag_offset = 0
+        self.current_gesture = None
+        
+        # Animation fluide
+        self.animation_offset = 0
+        self.target_offset = 0
+        self.animation_speed = 0.2
+        self.max_drag_distance = screen_width // 2
+        
         self.callbacks = {
             'swipe_left': [],
             'swipe_right': [], 
             'swipe_up': [],
-            'swipe_down': []
+            'swipe_down': [],
+            'drag_start': [],
+            'drag_move': [],
+            'drag_end': []
         }
     
     def register_callback(self, gesture_type: str, callback: Callable):
@@ -52,15 +68,49 @@ class GestureManager:
             self.callbacks[gesture_type].append(callback)
     
     def handle_event(self, event) -> Optional[GestureEvent]:
-        """Traite les événements tactiles/souris"""
+        """Traite les événements tactiles/souris avec animations fluides"""
+        current_time = time.time()
+        
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.touch_start = pygame.mouse.get_pos()
-            self.touch_start_time = time.time()
+            self.touch_start_time = current_time
+            self.is_dragging = False
+            self.drag_offset = 0
+            self._trigger_callbacks_with_data('drag_start', {'position': self.touch_start})
+            return None
+        
+        elif event.type == pygame.MOUSEMOTION and self.touch_start:
+            current_pos = pygame.mouse.get_pos()
+            dx = current_pos[0] - self.touch_start[0]
+            dy = current_pos[1] - self.touch_start[1]
+            distance = math.sqrt(dx*dx + dy*dy)
+            
+            # Détecter début du drag si mouvement suffisant
+            if distance > 10 and not self.is_dragging:
+                self.is_dragging = True
+                self.current_gesture = self._detect_gesture_direction(dx, dy)
+            
+            # Si on est en train de draguer
+            if self.is_dragging:
+                # Limiter le drag selon la direction
+                if abs(dx) > abs(dy):  # Drag horizontal
+                    self.drag_offset = max(-self.max_drag_distance, 
+                                         min(self.max_drag_distance, dx))
+                else:  # Drag vertical
+                    self.drag_offset = max(-self.max_drag_distance, 
+                                         min(self.max_drag_distance, dy))
+                
+                self._trigger_callbacks_with_data('drag_move', {
+                    'offset': self.drag_offset,
+                    'direction': self.current_gesture,
+                    'position': current_pos
+                })
+            
             return None
         
         elif event.type == pygame.MOUSEBUTTONUP and self.touch_start:
             touch_end = pygame.mouse.get_pos()
-            touch_end_time = time.time()
+            touch_end_time = current_time
             
             # Calculer distance et vélocité
             dx = touch_end[0] - self.touch_start[0]
@@ -69,33 +119,55 @@ class GestureManager:
             duration = max(touch_end_time - self.touch_start_time, 0.001)
             velocity = distance / duration
             
-            # Vérifier si c'est un geste valide
-            if distance >= self.min_distance and velocity >= self.min_velocity:
-                gesture_event = self._detect_gesture(dx, dy, distance, velocity)
-                if gesture_event:
-                    self._trigger_callbacks(gesture_event)
-                    return gesture_event
+            gesture_event = None
             
+            # Si c'était un drag, vérifier s'il faut déclencher un swipe
+            if self.is_dragging:
+                abs_offset = abs(self.drag_offset)
+                
+                # Swipe confirmé si dépassement du seuil ou vélocité suffisante
+                if abs_offset > self.min_swipe_threshold or velocity > self.min_velocity:
+                    gesture_event = self._create_gesture_event(dx, dy, distance, velocity)
+                    if gesture_event:
+                        self._trigger_callbacks(gesture_event)
+                        # Animation de retour fluide
+                        self.target_offset = self.screen_width if self.drag_offset > 0 else -self.screen_width
+                else:
+                    # Retour à la position initiale
+                    self.target_offset = 0
+                
+                self._trigger_callbacks_with_data('drag_end', {
+                    'offset': self.drag_offset,
+                    'confirmed': gesture_event is not None,
+                    'gesture': gesture_event
+                })
+            
+            # Vérifier geste simple (click/tap)
+            elif distance < self.min_distance and duration < 0.5:
+                # C'est un tap/click simple
+                self._trigger_callbacks_with_data('tap', {'position': touch_end})
+            
+            # Reset
             self.touch_start = None
             self.touch_start_time = None
-            return None
+            self.is_dragging = False
+            self.current_gesture = None
+            
+            return gesture_event
     
-    def _detect_gesture(self, dx: float, dy: float, distance: float, velocity: float) -> Optional[GestureEvent]:
-        """Détecte le type de geste"""
+    def _detect_gesture_direction(self, dx: float, dy: float) -> str:
+        """Détecte la direction du geste"""
         abs_dx = abs(dx)
         abs_dy = abs(dy)
         
-        # Déterminer direction principale
         if abs_dx > abs_dy:  # Geste horizontal
-            if dx > 0:
-                gesture_type = 'swipe_right'
-            else:
-                gesture_type = 'swipe_left'
+            return 'swipe_right' if dx > 0 else 'swipe_left'
         else:  # Geste vertical
-            if dy > 0:
-                gesture_type = 'swipe_down'
-            else:
-                gesture_type = 'swipe_up'
+            return 'swipe_down' if dy > 0 else 'swipe_up'
+    
+    def _create_gesture_event(self, dx: float, dy: float, distance: float, velocity: float) -> Optional[GestureEvent]:
+        """Crée un événement de geste"""
+        gesture_type = self._detect_gesture_direction(dx, dy)
         
         return GestureEvent(
             gesture_type=gesture_type,
@@ -113,6 +185,36 @@ class GestureManager:
                 callback(gesture_event)
             except Exception as e:
                 logger.error(f"Erreur callback geste {gesture_event.gesture_type}: {e}")
+    
+    def _trigger_callbacks_with_data(self, event_type: str, data: Dict):
+        """Déclenche les callbacks avec données supplémentaires"""
+        if event_type in self.callbacks:
+            for callback in self.callbacks[event_type]:
+                try:
+                    callback(data)
+                except Exception as e:
+                    logger.error(f"Erreur callback {event_type}: {e}")
+    
+    def update_animation(self):
+        """Met à jour l'animation fluide"""
+        # Animation interpolée vers la cible
+        diff = self.target_offset - self.animation_offset
+        if abs(diff) > 1:
+            self.animation_offset += diff * self.animation_speed
+        else:
+            self.animation_offset = self.target_offset
+    
+    def get_current_offset(self) -> float:
+        """Récupère l'offset actuel pour l'affichage"""
+        if self.is_dragging:
+            return self.drag_offset
+        return self.animation_offset
+    
+    def reset_animation(self):
+        """Remet l'animation à zéro"""
+        self.target_offset = 0
+        self.animation_offset = 0
+        self.drag_offset = 0
 
 # Configuration écran rond
 SCREEN_WIDTH = SCREEN_CONFIG['width']

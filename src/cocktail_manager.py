@@ -532,8 +532,8 @@ class CocktailMaker:
         if self.progress_callback:
             self.progress_callback(step, progress)
     
-    async def prepare_cocktail(self, cocktail_id: str, size_multiplier: float = 1.0) -> bool:
-        """Prépare un cocktail de façon asynchrone"""
+    async def prepare_cocktail(self, cocktail_id: str, size_multiplier: float = 1.0, dose_mode: str = "single") -> bool:
+        """Prépare un cocktail de façon asynchrone avec support simple/double dose"""
         try:
             with self._preparation_lock:
                 if self.preparation_status != "idle":
@@ -549,10 +549,14 @@ class CocktailMaker:
                     logger.error(f"Cocktail non réalisable: {cocktail.missing_ingredients}")
                     return False
                 
+                # Calculer le multiplicateur selon le mode de dose
+                final_multiplier = self._calculate_dose_multiplier(dose_mode, size_multiplier)
+                
                 self.current_order = cocktail
                 self.preparation_status = "preparing"
                 
-                logger.info(f"[COCKTAIL] Début préparation: {cocktail.name}")
+                dose_text = "simple" if dose_mode == "single" else "double" if dose_mode == "double" else f"x{final_multiplier:.1f}"
+                logger.info(f"[COCKTAIL] Début préparation: {cocktail.name} (dose {dose_text})")
                 self._notify_progress("Initialisation", 0)
                 
                 # Vérifier le système de pompes
@@ -573,8 +577,8 @@ class CocktailMaker:
                             logger.warning(f"Ingrédient indisponible: {ingredient.name}")
                             continue
                         
-                        # Calculer le volume avec multiplicateur
-                        volume = ingredient.amount_ml * size_multiplier
+                        # Calculer le volume avec multiplicateur final
+                        volume = ingredient.amount_ml * final_multiplier
                         
                         step_name = f"Versement {ingredient.name}"
                         progress = (current_step / total_steps) * 100
@@ -629,6 +633,18 @@ class CocktailMaker:
             if self.preparation_status != "idle":
                 self.preparation_status = "idle"
                 self.current_order = None
+    
+    def _calculate_dose_multiplier(self, dose_mode: str, base_multiplier: float = 1.0) -> float:
+        """Calcule le multiplicateur de dose final"""
+        dose_multipliers = {
+            "single": 1.0,
+            "double": 2.0,
+            "half": 0.5,
+            "triple": 3.0
+        }
+        
+        dose_factor = dose_multipliers.get(dose_mode, 1.0)
+        return base_multiplier * dose_factor
     
     def _get_pour_order(self, category: str) -> int:
         """Définit l'ordre de versement optimal"""

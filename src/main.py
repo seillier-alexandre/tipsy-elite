@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Point d'entrée principal pour la machine à cocktails Tipsy Elite
 Architecture complète avec interface Art Déco, contrôle hardware et systèmes intelligents
+Auto-start compatible avec systemd pour Raspberry Pi
 """
 import logging
 import sys
@@ -272,6 +274,167 @@ class TipsyDemoMode:
             if self.interface:
                 self.interface.cleanup()
 
+class TipsyMultiProcessSystem:
+    """Système multi-process avec Pygame + Streamlit"""
+    
+    def __init__(self):
+        self.web_process = None
+        self.pygame_process = None
+        self.running = False
+    
+    def start_web_interface(self):
+        """Lance l'interface web Streamlit"""
+        import subprocess
+        import sys
+        
+        try:
+            logger.info("[WEB] Démarrage interface web Streamlit...")
+            
+            # Commande pour lancer Streamlit
+            cmd = [
+                sys.executable, "-m", "streamlit", "run",
+                "src/web_interface.py",
+                "--server.port", "8501",
+                "--server.address", "0.0.0.0",
+                "--browser.gatherUsageStats", "false",
+                "--server.headless", "true"
+            ]
+            
+            self.web_process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=Path.cwd()
+            )
+            
+            logger.info("[WEB] Interface web démarrée sur http://localhost:8501")
+            return True
+            
+        except Exception as e:
+            logger.error(f"[WEB] Erreur démarrage interface web: {e}")
+            return False
+    
+    def start_pygame_interface(self):
+        """Lance l'interface Pygame dans un processus séparé"""
+        import subprocess
+        import sys
+        
+        try:
+            logger.info("[PYGAME] Démarrage interface tactile...")
+            
+            # Script pour l'interface Pygame
+            pygame_script = """
+import sys
+sys.path.insert(0, 'src')
+
+from art_deco_interface import ArtDecoInterface
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+try:
+    interface = ArtDecoInterface()
+    if interface.initialize():
+        interface.run()
+    else:
+        logger.error("Échec initialisation interface")
+except Exception as e:
+    logger.error(f"Erreur interface Pygame: {e}")
+"""
+            
+            self.pygame_process = subprocess.Popen(
+                [sys.executable, "-c", pygame_script],
+                cwd=Path.cwd()
+            )
+            
+            logger.info("[PYGAME] Interface tactile démarrée")
+            return True
+            
+        except Exception as e:
+            logger.error(f"[PYGAME] Erreur démarrage interface tactile: {e}")
+            return False
+    
+    def run(self):
+        """Lance les deux interfaces simultanément"""
+        try:
+            self.running = True
+            logger.info("[MULTI] Démarrage système multi-process")
+            
+            # Démarrer interface web
+            if not self.start_web_interface():
+                logger.error("[MULTI] Échec démarrage interface web")
+                return False
+            
+            # Attendre que Streamlit soit prêt
+            time.sleep(3)
+            
+            # Démarrer interface Pygame
+            if not self.start_pygame_interface():
+                logger.error("[MULTI] Échec démarrage interface tactile")
+                self.stop()
+                return False
+            
+            logger.info("[MULTI] Toutes les interfaces sont opérationnelles")
+            logger.info("[MULTI] Interface Web: http://localhost:8501")
+            logger.info("[MULTI] Interface Tactile: Écran principal")
+            
+            # Surveiller les processus
+            self.monitor_processes()
+            
+        except KeyboardInterrupt:
+            logger.info("[MULTI] Arrêt demandé par utilisateur")
+            self.stop()
+        except Exception as e:
+            logger.error(f"[MULTI] Erreur système: {e}")
+            self.stop()
+    
+    def monitor_processes(self):
+        """Surveille l'état des processus"""
+        try:
+            while self.running:
+                # Vérifier processus web
+                if self.web_process and self.web_process.poll() is not None:
+                    logger.warning("[WEB] Processus web terminé")
+                    break
+                
+                # Vérifier processus Pygame
+                if self.pygame_process and self.pygame_process.poll() is not None:
+                    logger.warning("[PYGAME] Processus tactile terminé")
+                    break
+                
+                time.sleep(2)
+                
+        except Exception as e:
+            logger.error(f"[MULTI] Erreur surveillance: {e}")
+        finally:
+            self.stop()
+    
+    def stop(self):
+        """Arrête tous les processus"""
+        logger.info("[MULTI] Arrêt du système multi-process")
+        self.running = False
+        
+        # Arrêter processus web
+        if self.web_process:
+            try:
+                self.web_process.terminate()
+                self.web_process.wait(timeout=5)
+                logger.info("[WEB] Interface web arrêtée")
+            except subprocess.TimeoutExpired:
+                self.web_process.kill()
+                logger.warning("[WEB] Interface web forcée à s'arrêter")
+        
+        # Arrêter processus Pygame
+        if self.pygame_process:
+            try:
+                self.pygame_process.terminate()
+                self.pygame_process.wait(timeout=5)
+                logger.info("[PYGAME] Interface tactile arrêtée")
+            except subprocess.TimeoutExpired:
+                self.pygame_process.kill()
+                logger.warning("[PYGAME] Interface tactile forcée à s'arrêter")
+
 def main():
     """Point d'entrée principal"""
     import argparse
@@ -282,6 +445,12 @@ def main():
                        help="Lance en mode démo (sans hardware)")
     parser.add_argument("--async-mode", action="store_true",
                        help="Lance en mode asynchrone")
+    parser.add_argument("--multi-process", action="store_true",
+                       help="Lance en mode multi-process (Pygame + Web)")
+    parser.add_argument("--web-only", action="store_true",
+                       help="Lance uniquement l'interface web")
+    parser.add_argument("--pygame-only", action="store_true",
+                       help="Lance uniquement l'interface tactile")
     parser.add_argument("--debug", action="store_true",
                        help="Active le mode debug")
     
@@ -292,21 +461,63 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
         logger.debug("Mode debug activé")
     
+    # Configuration des signaux pour arrêt propre
+    import signal
+    current_system = None
+    
+    def signal_handler(signum, _frame):
+        logger.info(f"Signal {signum} reçu")
+        if current_system:
+            if hasattr(current_system, 'stop'):
+                current_system.stop()
+            else:
+                current_system.running = False
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
     # Démarrage selon le mode
-    if args.demo:
+    if args.web_only:
+        # Interface web uniquement
+        logger.info("Démarrage interface web uniquement")
+        import subprocess
+        import sys
+        subprocess.run([
+            sys.executable, "-m", "streamlit", "run", 
+            "src/web_interface.py", "--server.port", "8501"
+        ])
+        
+    elif args.pygame_only:
+        # Interface Pygame uniquement
+        logger.info("Démarrage interface tactile uniquement")
+        if args.demo:
+            demo = TipsyDemoMode()
+            current_system = demo
+            demo.run()
+        else:
+            system = TipsySystem()
+            current_system = system
+            if args.async_mode:
+                system.run_async()
+            else:
+                system.run()
+                
+    elif args.multi_process:
+        # Mode multi-process
+        logger.info("Démarrage mode multi-process")
+        multi_system = TipsyMultiProcessSystem()
+        current_system = multi_system
+        multi_system.run()
+        
+    elif args.demo:
+        # Mode démo
         demo = TipsyDemoMode()
+        current_system = demo
         demo.run()
     else:
+        # Mode standard
         system = TipsySystem()
-        
-        # Configuration des signaux pour arrêt propre
-        import signal
-        def signal_handler(signum, _frame):
-            logger.info(f"Signal {signum} reçu")
-            system.stop()
-        
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
+        current_system = system
         
         # Démarrage
         if args.async_mode:
