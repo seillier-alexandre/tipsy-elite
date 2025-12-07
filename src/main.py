@@ -28,7 +28,7 @@ def setup_logging():
     
     # Logger principal
     logger = logging.getLogger(__name__)
-    logger.info("🍸 Démarrage Tipsy Elite - Machine à Cocktails")
+    logger.info("Démarrage Tipsy Elite - Machine à Cocktails")
     return logger
 
 # Import des modules après configuration du logging
@@ -61,74 +61,74 @@ class TipsySystem:
     
     def initialize(self) -> bool:
         """Initialise tous les systèmes"""
-        logger.info("🔧 Initialisation des systèmes...")
+        logger.info("[INIT] Initialisation des systèmes...")
         
         # 1. Validation de la configuration hardware
-        logger.info("📋 Validation configuration hardware...")
+        logger.info("[CONFIG] Validation configuration hardware...")
         validator = HardwareValidator()
         if not validator.validate_gpio_configuration():
-            logger.error("❌ Configuration GPIO invalide")
+            logger.error("[ERROR] Configuration GPIO invalide")
             return False
         
         if not validator.validate_pump_configuration():
-            logger.error("❌ Configuration pompes invalide")
+            logger.error("[ERROR] Configuration pompes invalide")
             return False
         
-        logger.info("✅ Configuration hardware validée")
+        logger.info("[OK] Configuration hardware validée")
         
         # 2. Initialisation du système de pompes
-        logger.info("⚙️ Initialisation système de pompes...")
+        logger.info("[INIT] Initialisation système de pompes...")
         if not initialize_pump_system():
-            logger.error("❌ Échec initialisation pompes")
+            logger.error("[ERROR] Échec initialisation pompes")
             return False
-        logger.info("✅ Système de pompes initialisé")
+        logger.info("[OK] Système de pompes initialisé")
         
         # 3. Initialisation du système de cocktails
-        logger.info("🍹 Initialisation système de cocktails...")
+        logger.info("[INIT] Initialisation système de cocktails...")
         if not initialize_cocktail_system():
-            logger.error("❌ Échec initialisation cocktails")
+            logger.error("[ERROR] Échec initialisation cocktails")
             return False
         
         self.cocktail_manager = get_cocktail_manager()
-        logger.info("✅ Système de cocktails initialisé")
+        logger.info("[OK] Système de cocktails initialisé")
         
         # 4. Initialisation du système de nettoyage
-        logger.info("🧼 Initialisation système de nettoyage...")
+        logger.info("[INIT] Initialisation système de nettoyage...")
         if not initialize_cleaning_system():
-            logger.error("❌ Échec initialisation nettoyage")
+            logger.error("[ERROR] Échec initialisation nettoyage")
             return False
         
         self.cleaning_system = get_cleaning_system()
-        logger.info("✅ Système de nettoyage initialisé")
+        logger.info("[OK] Système de nettoyage initialisé")
         
         # 5. Initialisation de l'interface
-        logger.info("🖥️ Initialisation interface utilisateur...")
+        logger.info("[INIT] Initialisation interface utilisateur...")
         self.interface = ArtDecoInterface()
         if not self.interface.initialize():
-            logger.error("❌ Échec initialisation interface")
+            logger.error("[ERROR] Échec initialisation interface")
             return False
-        logger.info("✅ Interface utilisateur initialisée")
+        logger.info("[OK] Interface utilisateur initialisée")
         
-        logger.info("🚀 Tous les systèmes sont opérationnels")
+        logger.info("[READY] Tous les systèmes sont opérationnels")
         return True
     
     def run(self):
         """Lance le système principal"""
         if not self.initialize():
-            logger.error("❌ Échec d'initialisation - Arrêt")
+            logger.error("[ERROR] Échec d'initialisation - Arrêt")
             return
         
         try:
             self.running = True
-            logger.info("🏁 Démarrage de l'interface principale")
+            logger.info("[START] Démarrage de l'interface principale")
             
             # Lancer l'interface dans le thread principal (requis pour Pygame)
             self.interface.run()
             
         except KeyboardInterrupt:
-            logger.info("⏹️ Arrêt demandé par l'utilisateur")
+            logger.info("[STOP] Arrêt demandé par l'utilisateur")
         except Exception as e:
-            logger.error(f"❌ Erreur fatale: {e}")
+            logger.error(f"[ERROR] Erreur fatale: {e}")
             import traceback
             traceback.print_exc()
         finally:
@@ -137,7 +137,7 @@ class TipsySystem:
     def run_async(self):
         """Lance le système avec interface asynchrone"""
         if not self.initialize():
-            logger.error("❌ Échec d'initialisation - Arrêt")
+            logger.error("[ERROR] Échec d'initialisation - Arrêt")
             return
         
         try:
@@ -155,9 +155,9 @@ class TipsySystem:
             asyncio.run(self.main_async_loop())
             
         except KeyboardInterrupt:
-            logger.info("⏹️ Arrêt demandé par l'utilisateur")
+            logger.info("[STOP] Arrêt demandé par l'utilisateur")
         except Exception as e:
-            logger.error(f"❌ Erreur fatale: {e}")
+            logger.error(f"[ERROR] Erreur fatale: {e}")
             import traceback
             traceback.print_exc()
         finally:
@@ -165,7 +165,7 @@ class TipsySystem:
     
     async def main_async_loop(self):
         """Boucle principale asynchrone pour tâches background"""
-        logger.info("🔄 Boucle principale démarrée")
+        logger.info("[LOOP] Boucle principale démarrée")
         
         last_maintenance_check = 0
         
@@ -185,7 +185,7 @@ class TipsySystem:
                 logger.error(f"Erreur boucle principale: {e}")
                 await asyncio.sleep(5)
         
-        logger.info("🔄 Boucle principale terminée")
+        logger.info("[LOOP] Boucle principale terminée")
     
     async def check_maintenance(self):
         """Vérifie et programme les tâches de maintenance"""
@@ -197,7 +197,7 @@ class TipsySystem:
             
             if maintenance_info['needs_cleaning']:
                 mode = maintenance_info['recommended_mode']
-                logger.info(f"🧼 Maintenance recommandée: {mode}")
+                logger.info(f"[MAINTENANCE] Maintenance recommandée: {mode}")
                 
                 # Ne pas démarrer automatiquement le nettoyage pendant une préparation
                 if not self.cocktail_manager.maker.preparation_status == "preparing":
@@ -211,7 +211,7 @@ class TipsySystem:
     
     def stop(self):
         """Arrête le système"""
-        logger.info("🛑 Arrêt du système demandé")
+        logger.info("[STOP] Arrêt du système demandé")
         self.running = False
         
         if self.interface:
@@ -222,7 +222,7 @@ class TipsySystem:
         if self.cleanup_done:
             return
         
-        logger.info("🧹 Nettoyage des ressources...")
+        logger.info("[CLEANUP] Nettoyage des ressources...")
         
         self.running = False
         
@@ -245,7 +245,7 @@ class TipsySystem:
             logger.error(f"Erreur nettoyage pompes: {e}")
         
         self.cleanup_done = True
-        logger.info("✅ Nettoyage terminé")
+        logger.info("[OK] Nettoyage terminé")
 
 class TipsyDemoMode:
     """Mode démo pour test sans hardware"""
@@ -255,7 +255,7 @@ class TipsyDemoMode:
     
     def run(self):
         """Lance le mode démo"""
-        logger.info("🎭 Démarrage mode démo (sans hardware)")
+        logger.info("[DEMO] Démarrage mode démo (sans hardware)")
         
         try:
             # Interface uniquement

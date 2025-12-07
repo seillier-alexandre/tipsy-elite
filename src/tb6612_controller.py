@@ -286,10 +286,10 @@ class PumpManager:
                 
                 if success_count == len(self.controllers):
                     self.is_initialized = True
-                    logger.info(f"✅ Tous les contrôleurs TB6612 initialisés ({success_count}/{len(self.controllers)})")
+                    logger.info(f"[OK] Tous les contrôleurs TB6612 initialisés ({success_count}/{len(self.controllers)})")
                     return True
                 else:
-                    logger.error(f"❌ Échec initialisation: {success_count}/{len(self.controllers)} contrôleurs")
+                    logger.error(f"[ERROR] Échec initialisation: {success_count}/{len(self.controllers)} contrôleurs")
                     return False
                     
         except Exception as e:
@@ -414,7 +414,7 @@ class PumpManager:
     
     def emergency_stop(self):
         """Arrêt d'urgence de toutes les pompes"""
-        logger.warning("🚨 ARRÊT D'URGENCE ACTIVÉ")
+        logger.warning("[EMERGENCY] ARRÊT D'URGENCE ACTIVÉ")
         self._emergency_stop = True
         
         with self._global_lock:

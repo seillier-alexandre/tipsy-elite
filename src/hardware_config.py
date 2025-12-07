@@ -74,13 +74,13 @@ TB6612_CONTROLLERS: List[TB6612FNGConfig] = [
     ),
     # Contrôleur 5 - Pompes 9 & 10
     TB6612FNGConfig(
-        ain1=0, ain2=1, bin1=28, bin2=29,
-        pwma=30, pwmb=31, stby=32
+        ain1=0, ain2=1, bin1=7, bin2=8,
+        pwma=12, pwmb=16, stby=20
     ),
     # Contrôleur 6 - Pompes 11 & 12 + Pompe de nettoyage
     TB6612FNGConfig(
-        ain1=33, ain2=34, bin1=35, bin2=36,
-        pwma=37, pwmb=38, stby=39
+        ain1=21, ain2=26, bin1=19, bin2=13,
+        pwma=6, pwmb=5, stby=11
     ),
 ]
 
@@ -239,6 +239,6 @@ def get_controller_for_pump(pump_id: int) -> Optional[TB6612FNGConfig]:
 if __name__ == "__main__":
     validator = HardwareValidator()
     if validator.validate_gpio_configuration() and validator.validate_pump_configuration():
-        logger.info("✅ Configuration matérielle validée avec succès")
+        logger.info("[OK] Configuration matérielle validée avec succès")
     else:
-        logger.error("❌ Erreurs détectées dans la configuration matérielle")
+        logger.error("[ERROR] Erreurs détectées dans la configuration matérielle")

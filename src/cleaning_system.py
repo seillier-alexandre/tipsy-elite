@@ -324,7 +324,7 @@ class CleaningSystem:
                 cycle = CLEANING_CYCLES[mode]
                 self.status.estimated_completion = datetime.now() + timedelta(seconds=cycle.total_duration)
                 
-                logger.info(f"🧼 Début nettoyage {mode.value} - Pompes: {pump_ids}")
+                logger.info(f"[CLEANING] Début nettoyage {mode.value} - Pompes: {pump_ids}")
                 logger.info(f"   Phases: {[p.value for p in cycle.phases]}")
                 logger.info(f"   Durée estimée: {cycle.total_duration}s")
                 
@@ -360,10 +360,10 @@ class CleaningSystem:
                         self.cocktails_since_cleaning = 0
                     
                     self.status.last_cleaning = datetime.now()
-                    logger.info(f"✅ Nettoyage terminé avec succès en {duration:.1f}s")
+                    logger.info(f"[OK] Nettoyage terminé avec succès en {duration:.1f}s")
                     success = True
                 else:
-                    logger.warning("❌ Nettoyage interrompu")
+                    logger.warning("[WARNING] Nettoyage interrompu")
                     success = False
                 
                 # Nettoyer le statut
@@ -549,7 +549,7 @@ class CleaningSystem:
                     pump_sys.stop_pump(pump_id)
                     await asyncio.sleep(0.5)
             
-            logger.info("✅ Rinçage rapide terminé")
+            logger.info("[OK] Rinçage rapide terminé")
             return True
         
         except Exception as e:
@@ -566,10 +566,10 @@ def get_cleaning_system() -> CleaningSystem:
 def initialize_cleaning_system() -> bool:
     """Initialise le système de nettoyage"""
     try:
-        logger.info("✅ Système de nettoyage initialisé")
+        logger.info("[OK] Système de nettoyage initialisé")
         return True
     except Exception as e:
-        logger.error(f"❌ Erreur initialisation système nettoyage: {e}")
+        logger.error(f"[ERROR] Erreur initialisation système nettoyage: {e}")
         return False
 
 if __name__ == "__main__":

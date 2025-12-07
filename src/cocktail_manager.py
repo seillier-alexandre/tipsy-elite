@@ -417,7 +417,7 @@ class CocktailMaker:
                 self.current_order = cocktail
                 self.preparation_status = "preparing"
                 
-                logger.info(f"🍸 Début préparation: {cocktail.name}")
+                logger.info(f"[COCKTAIL] Début préparation: {cocktail.name}")
                 self._notify_progress("Initialisation", 0)
                 
                 # Vérifier le système de pompes
@@ -480,7 +480,7 @@ class CocktailMaker:
                     cocktail.popularity += 1
                     self.database.save_database()
                     
-                    logger.info(f"✅ Cocktail préparé avec succès: {cocktail.name}")
+                    logger.info(f"[OK] Cocktail préparé avec succès: {cocktail.name}")
                     return True
         
         except Exception as e:
@@ -613,10 +613,10 @@ def initialize_cocktail_system() -> bool:
     """Initialise le système de cocktails"""
     try:
         # Le gestionnaire est déjà initialisé
-        logger.info("✅ Système de cocktails initialisé")
+        logger.info("[OK] Système de cocktails initialisé")
         return True
     except Exception as e:
-        logger.error(f"❌ Erreur initialisation système cocktails: {e}")
+        logger.error(f"[ERROR] Erreur initialisation système cocktails: {e}")
         return False
 
 if __name__ == "__main__":
