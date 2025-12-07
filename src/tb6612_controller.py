@@ -7,6 +7,9 @@ Architecture haute performance et sécurisée
 import logging
 import time
 import threading
+import signal
+import atexit
+import sys
 from typing import Dict, Optional
 from contextlib import contextmanager
 from dataclasses import dataclass

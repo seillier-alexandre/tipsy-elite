@@ -29,13 +29,54 @@ logger = logging.getLogger(__name__)
 # Import des modules internes
 try:
     from hardware_config import PUMP_CONFIGS, get_pump_by_ingredient, SCREEN_CONFIG
-    from tb6612_controller import pump_manager, pump_operation
-    from cocktail_manager import get_cocktail_manager, CocktailRecipe, Ingredient
-    from cleaning_system import get_cleaning_system
     HARDWARE_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"Modules hardware non disponibles: {e}")
+    logger.warning(f"hardware_config non disponible: {e}")
     HARDWARE_AVAILABLE = False
+    PUMP_CONFIGS = []
+    def get_pump_by_ingredient(name): return None
+    SCREEN_CONFIG = {'width': 800, 'height': 600}
+
+try:
+    from tb6612_controller import pump_manager, pump_operation
+except ImportError as e:
+    logger.warning(f"tb6612_controller non disponible: {e}")
+    pump_manager = None
+    def pump_operation(): 
+        class MockPumpOperation:
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def pour_volume(self, pump_id, volume): return True
+            def prime_pump(self, pump_id, duration): return True
+        return MockPumpOperation()
+
+try:
+    from cocktail_manager import get_cocktail_manager, CocktailRecipe, Ingredient
+except ImportError as e:
+    logger.warning(f"cocktail_manager non disponible: {e}")
+    def get_cocktail_manager(): 
+        class MockManager:
+            def __init__(self):
+                self.database = MockDatabase()
+                self.maker = MockMaker()
+        class MockDatabase:
+            def get_makeable_cocktails(self): return []
+            def get_all_cocktails(self): return []
+        class MockMaker:
+            def prepare_cocktail(self, *args): return True
+            @property
+            def preparation_status(self): return "idle"
+        return MockManager()
+
+try:
+    from cleaning_system import get_cleaning_system
+except ImportError as e:
+    logger.warning(f"cleaning_system non disponible: {e}")
+    def get_cleaning_system():
+        class MockCleaning:
+            def start_cleaning(self, mode): pass
+            def clean_pump(self, pump_id): return True
+        return MockCleaning()
 
 class WebConfigurationManager:
     """Gestionnaire de configuration web pour la machine à cocktails"""
