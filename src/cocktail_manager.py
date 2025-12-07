@@ -18,6 +18,14 @@ from tb6612_controller import pump_manager, pump_operation
 
 logger = logging.getLogger(__name__)
 
+# Import conditionnel du gestionnaire d'images
+try:
+    from image_manager import get_image_manager
+    IMAGE_SUPPORT = True
+except ImportError:
+    logger.warning("ImageManager non disponible - images désactivées")
+    IMAGE_SUPPORT = False
+
 @dataclass
 class Ingredient:
     """Ingrédient d'un cocktail"""
@@ -41,12 +49,12 @@ class Ingredient:
 
 @dataclass
 class CocktailRecipe:
-    """Recette de cocktail complète"""
+    """Recette de cocktail complète avec support images et métadonnées étendues"""
     id: str
     name: str
     ingredients: List[Ingredient]
     description: str = ""
-    category: str = "classic"  # classic, modern, tropical, spirit_forward
+    category: str = "classic"  # classic, modern, tropical, prohibition, elegant
     difficulty: int = 1  # 1-5
     preparation_time: int = 60  # secondes
     glass_type: str = "rocks"
@@ -55,11 +63,37 @@ class CocktailRecipe:
     popularity: int = 0
     created_at: str = ""
     
+    # Nouvelles propriétés étendues
+    display_name: str = ""
+    era: str = ""
+    origin: str = ""
+    story: str = ""
+    alcohol_content: float = 0.0
+    total_volume_ml: float = 0.0
+    cost_estimation: float = 0.0
+    images: Dict[str, str] = None
+    taste_profile: Dict[str, int] = None
+    mood_tags: List[str] = None
+    weather_tags: List[str] = None
+    occasion_tags: List[str] = None
+    
     def __post_init__(self):
         if self.instructions is None:
             self.instructions = []
         if not self.created_at:
             self.created_at = datetime.now().isoformat()
+        if self.images is None:
+            self.images = {}
+        if self.taste_profile is None:
+            self.taste_profile = {}
+        if self.mood_tags is None:
+            self.mood_tags = []
+        if self.weather_tags is None:
+            self.weather_tags = []
+        if self.occasion_tags is None:
+            self.occasion_tags = []
+        if not self.display_name:
+            self.display_name = self.name
     
     @property
     def total_volume(self) -> float:
@@ -77,11 +111,34 @@ class CocktailRecipe:
         return [ing.name for ing in self.ingredients 
                 if not ing.is_available and ing.category != "garnish"]
     
+    def get_image_path(self, image_type: str = 'main') -> str:
+        """Récupère le chemin d'une image du cocktail"""
+        if IMAGE_SUPPORT and self.images:
+            return self.images.get(image_type, self.images.get('main', ''))
+        return f"cocktails/{self.id}_{image_type}.jpg"
+    
+    def load_image(self, image_type: str = 'main', size: Optional[Tuple[int, int]] = None):
+        """Charge l'image du cocktail avec le gestionnaire d'images"""
+        if IMAGE_SUPPORT:
+            return get_image_manager().load_cocktail_image(self.id, image_type, size)
+        return None
+    
+    def preload_images(self):
+        """Précharge toutes les images du cocktail"""
+        if IMAGE_SUPPORT:
+            image_manager = get_image_manager()
+            for image_type in ['main', 'thumb', 'ingredients']:
+                try:
+                    image_manager.load_cocktail_image(self.id, image_type)
+                except Exception as e:
+                    logger.debug(f"Erreur préchargement {self.id}.{image_type}: {e}")
+    
     def to_dict(self) -> Dict[str, Any]:
-        """Convertit en dictionnaire"""
-        return {
+        """Convertit en dictionnaire complet"""
+        base_dict = {
             'id': self.id,
             'name': self.name,
+            'display_name': self.display_name,
             'ingredients': [asdict(ing) for ing in self.ingredients],
             'description': self.description,
             'category': self.category,
@@ -91,18 +148,58 @@ class CocktailRecipe:
             'garnish': self.garnish,
             'instructions': self.instructions,
             'popularity': self.popularity,
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'era': self.era,
+            'origin': self.origin,
+            'story': self.story,
+            'alcohol_content': self.alcohol_content,
+            'total_volume_ml': self.total_volume_ml,
+            'cost_estimation': self.cost_estimation,
+            'images': self.images,
+            'taste_profile': self.taste_profile,
+            'mood_tags': self.mood_tags,
+            'weather_tags': self.weather_tags,
+            'occasion_tags': self.occasion_tags
         }
+        return base_dict
 
 class CocktailDatabase:
-    """Base de données des cocktails avec persistance JSON"""
+    """Base de données des cocktails avec persistance JSON et support images"""
     
-    def __init__(self, db_path: str = "config/cocktails.json"):
+    def __init__(self, db_path: str = "config/cocktails_complete.json", 
+                 ingredients_db_path: str = "config/ingredients_database.json"):
         self.db_path = Path(db_path)
+        self.ingredients_db_path = Path(ingredients_db_path)
         self.cocktails: Dict[str, CocktailRecipe] = {}
+        self.ingredients_database: Dict[str, Dict] = {}
         self._lock = threading.RLock()
+        self.load_ingredients_database()
         self.load_database()
     
+    def load_ingredients_database(self) -> bool:
+        """Charge la base de données des ingrédients"""
+        try:
+            if self.ingredients_db_path.exists():
+                with open(self.ingredients_db_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    self.ingredients_database = data.get('ingredients', {})
+                    logger.info(f"Base d'ingrédients chargée: {len(self.ingredients_database)} catégories")
+                    return True
+        except Exception as e:
+            logger.error(f"Erreur chargement base ingrédients: {e}")
+        
+        self.ingredients_database = {}
+        return False
+    
+    def get_ingredient_info(self, ingredient_name: str) -> Optional[Dict]:
+        """Récupère les informations détaillées d'un ingrédient"""
+        for category, ingredients in self.ingredients_database.items():
+            for ingredient_id, ingredient_data in ingredients.items():
+                if (ingredient_data.get('name', '').lower() == ingredient_name.lower() or
+                    ingredient_id.lower() == ingredient_name.lower().replace(' ', '_')):
+                    return ingredient_data
+        return None
+
     def load_database(self) -> bool:
         """Charge la base de données depuis le fichier JSON"""
         try:
@@ -111,19 +208,35 @@ class CocktailDatabase:
                     data = json.load(f)
                     
                 for cocktail_data in data.get('cocktails', []):
-                    # Reconstituer les ingrédients
+                    # Reconstituer les ingrédients avec informations enrichies
                     ingredients = []
                     for ing_data in cocktail_data.get('ingredients', []):
+                        # Récupérer infos détaillées de l'ingrédient si disponible
+                        ingredient_info = self.get_ingredient_info(ing_data['name'])
+                        
                         ingredient = Ingredient(
                             name=ing_data['name'],
-                            amount_ml=ing_data['amount_ml'],
+                            amount_ml=ing_data.get('amount_ml', 0.0),
                             pump_id=ing_data.get('pump_id'),
                             category=ing_data.get('category', 'spirits'),
                             is_available=ing_data.get('is_available', True)
                         )
+                        
+                        # Enrichir avec données de la base d'ingrédients
+                        if ingredient_info and ingredient.pump_id is None:
+                            # Essayer d'assigner automatiquement une pompe
+                            pump_config = get_pump_by_ingredient(ingredient.name)
+                            if pump_config:
+                                ingredient.pump_id = pump_config.pump_id
+                                ingredient.is_available = True
+                        
                         ingredients.append(ingredient)
                     
-                    # Créer la recette
+                    # Extraire données recette étendue
+                    recipe_data = cocktail_data.get('recipe', {})
+                    presentation_data = cocktail_data.get('presentation', {})
+                    
+                    # Créer la recette complète
                     cocktail = CocktailRecipe(
                         id=cocktail_data['id'],
                         name=cocktail_data['name'],
@@ -136,12 +249,30 @@ class CocktailDatabase:
                         garnish=cocktail_data.get('garnish', ''),
                         instructions=cocktail_data.get('instructions', []),
                         popularity=cocktail_data.get('popularity', 0),
-                        created_at=cocktail_data.get('created_at', '')
+                        created_at=cocktail_data.get('created_at', ''),
+                        # Nouvelles propriétés étendues
+                        display_name=cocktail_data.get('display_name', cocktail_data['name']),
+                        era=cocktail_data.get('era', ''),
+                        origin=cocktail_data.get('origin', ''),
+                        story=cocktail_data.get('story', ''),
+                        alcohol_content=recipe_data.get('alcohol_content', 0.0),
+                        total_volume_ml=recipe_data.get('total_volume_ml', 0.0),
+                        cost_estimation=cocktail_data.get('cost_estimation', 0.0),
+                        images=cocktail_data.get('images', {}),
+                        taste_profile=presentation_data.get('taste_profile', {}),
+                        mood_tags=cocktail_data.get('mood_tags', []),
+                        weather_tags=cocktail_data.get('weather_tags', []),
+                        occasion_tags=cocktail_data.get('occasion_tags', [])
                     )
                     
                     self.cocktails[cocktail.id] = cocktail
                 
                 logger.info(f"Base de données chargée: {len(self.cocktails)} cocktails")
+                
+                # Précharger les images en arrière-plan si support activé
+                if IMAGE_SUPPORT and self.cocktails:
+                    self._preload_cocktail_images()
+                
                 return True
             else:
                 # Créer une base de données par défaut
@@ -352,6 +483,16 @@ class CocktailDatabase:
     def get_makeable_cocktails(self) -> List[CocktailRecipe]:
         """Récupère les cocktails réalisables"""
         return [cocktail for cocktail in self.cocktails.values() if cocktail.is_makeable]
+    
+    def _preload_cocktail_images(self):
+        """Précharge les images des cocktails en arrière-plan"""
+        try:
+            cocktail_ids = list(self.cocktails.keys())
+            image_manager = get_image_manager()
+            image_manager.preload_cocktail_images(cocktail_ids, ['main', 'thumb'])
+            logger.info(f"Préchargement images démarré pour {len(cocktail_ids)} cocktails")
+        except Exception as e:
+            logger.error(f"Erreur préchargement images: {e}")
     
     def search_cocktails(self, query: str) -> List[CocktailRecipe]:
         """Recherche de cocktails par nom ou ingrédient"""

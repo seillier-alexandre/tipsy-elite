@@ -1,0 +1,672 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "last_updated": "2025-12-07T22:00:00.000Z",
+    "total_cocktails": 12,
+    "categories": ["classic", "modern", "tropical", "prohibition", "elegant"],
+    "difficulty_levels": [1, 2, 3, 4, 5],
+    "glass_types": ["rocks", "highball", "coupe", "martini", "old_fashioned"],
+    "image_base_path": "assets/images/cocktails/",
+    "default_image": "default_cocktail.png",
+    "description": "Base de données complète des cocktails Art Déco - Prohibition 1920s"
+  },
+  "cocktails": [
+    {
+      "id": "gin_tonic",
+      "name": "Gin Tonic",
+      "display_name": "Gin & Tonic",
+      "era": "1920s",
+      "origin": "British India",
+      "story": "Né dans l'Inde coloniale, ce classique des speakeasies allie médecine et plaisir.",
+      "ingredients": [
+        {
+          "ingredient_id": "gin",
+          "name": "Gin",
+          "amount_ml": 50.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "sprite",
+          "name": "Sprite",
+          "amount_ml": 100.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": true,
+          "substitutes": ["eau_gazeuse"]
+        },
+        {
+          "ingredient_id": "citron_vert",
+          "name": "Citron vert",
+          "amount": "1 quartier",
+          "order": 3,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Classique rafraîchissant, simple et élégant des clubs londoniens",
+        "category": "classic",
+        "sub_category": "highball",
+        "difficulty": 1,
+        "skill_level": "beginner",
+        "preparation_time": 45,
+        "serving_time": 30,
+        "total_volume_ml": 150.0,
+        "alcohol_content": 13.3,
+        "calories": 140,
+        "glass_type": "highball",
+        "ice_type": "cubes",
+        "temperature": "cold",
+        "garnish": "Quartier de citron vert",
+        "garnish_style": "wedge_rim"
+      },
+      "preparation": {
+        "method": "build",
+        "instructions": [
+          "Remplir le verre de glaçons",
+          "Verser le gin lentement",
+          "Compléter avec Sprite bien froide",
+          "Mélanger délicatement avec une cuillère à cocktail",
+          "Garnir avec quartier de citron vert sur le bord"
+        ],
+        "tips": [
+          "Servir le gin et le tonic très froids",
+          "Mélanger délicatement pour préserver les bulles",
+          "Presser légèrement le citron avant de garnir"
+        ],
+        "timing": {
+          "gin_pour": 3.0,
+          "mixer_pour": 5.0,
+          "stir": 2.0,
+          "garnish": 2.0
+        }
+      },
+      "presentation": {
+        "color_profile": ["transparent", "pale_green"],
+        "visual_appeal": 8,
+        "aroma_notes": ["juniper", "citrus", "fresh"],
+        "taste_profile": {
+          "sweetness": 3,
+          "sourness": 6,
+          "bitterness": 4,
+          "strength": 4,
+          "complexity": 3
+        }
+      },
+      "images": {
+        "main": "gin_tonic_main.jpg",
+        "ingredients": "gin_tonic_ingredients.jpg", 
+        "preparation": "gin_tonic_prep.jpg",
+        "serving": "gin_tonic_served.jpg",
+        "thumbnail": "gin_tonic_thumb.jpg"
+      },
+      "popularity": 5,
+      "cost_estimation": 2.85,
+      "profit_margin": 0.75,
+      "allergens": [],
+      "dietary": ["gluten_free"],
+      "mood_tags": ["refreshing", "classic", "elegant", "social"],
+      "weather_tags": ["summer", "hot", "evening"],
+      "occasion_tags": ["aperitif", "dinner", "party"],
+      "created_at": "2025-12-07T22:00:00.000Z",
+      "updated_at": "2025-12-07T22:00:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "old_fashioned",
+      "name": "Old Fashioned",
+      "display_name": "Old Fashioned",
+      "era": "1880s-1920s",
+      "origin": "Wisconsin, USA",
+      "story": "Le roi des cocktails prohibition, symbole de sophistication et de rébellion.",
+      "ingredients": [
+        {
+          "ingredient_id": "whisky",
+          "name": "Whisky",
+          "amount_ml": 60.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "sirop_simple",
+          "name": "Sirop simple",
+          "amount_ml": 10.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "orange",
+          "name": "Zeste d'orange",
+          "amount": "1 zeste",
+          "order": 3,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Cocktail de caractère, essence de l'époque prohibition",
+        "category": "prohibition",
+        "sub_category": "spirit_forward",
+        "difficulty": 3,
+        "skill_level": "intermediate",
+        "preparation_time": 90,
+        "serving_time": 45,
+        "total_volume_ml": 70.0,
+        "alcohol_content": 32.0,
+        "calories": 185,
+        "glass_type": "old_fashioned",
+        "ice_type": "large_cube",
+        "temperature": "chilled",
+        "garnish": "Zeste d'orange",
+        "garnish_style": "expressed_twist"
+      },
+      "preparation": {
+        "method": "stir",
+        "instructions": [
+          "Placer un gros glaçon dans le verre",
+          "Verser le sirop simple",
+          "Ajouter le whisky lentement",
+          "Remuer doucement 20 tours avec cuillère à cocktail",
+          "Exprimer les huiles du zeste d'orange au-dessus",
+          "Déposer le zeste dans le verre"
+        ],
+        "tips": [
+          "Utiliser un seul gros glaçon pour dilution lente",
+          "Remuer avec patience, ne jamais secouer",
+          "Exprimer le zeste avec confiance"
+        ],
+        "timing": {
+          "syrup_pour": 2.0,
+          "whisky_pour": 4.0,
+          "stir": 15.0,
+          "garnish": 8.0
+        }
+      },
+      "presentation": {
+        "color_profile": ["amber", "golden"],
+        "visual_appeal": 9,
+        "aroma_notes": ["oak", "vanilla", "orange", "caramel"],
+        "taste_profile": {
+          "sweetness": 4,
+          "sourness": 1,
+          "bitterness": 3,
+          "strength": 9,
+          "complexity": 8
+        }
+      },
+      "images": {
+        "main": "old_fashioned_main.jpg",
+        "ingredients": "old_fashioned_ingredients.jpg",
+        "preparation": "old_fashioned_prep.jpg", 
+        "serving": "old_fashioned_served.jpg",
+        "thumbnail": "old_fashioned_thumb.jpg"
+      },
+      "popularity": 8,
+      "cost_estimation": 4.20,
+      "profit_margin": 0.80,
+      "allergens": [],
+      "dietary": ["gluten_free"],
+      "mood_tags": ["sophisticated", "strong", "contemplative", "masculine"],
+      "weather_tags": ["winter", "cold", "evening"],
+      "occasion_tags": ["after_dinner", "business", "celebration"],
+      "created_at": "2025-12-07T22:00:00.000Z",
+      "updated_at": "2025-12-07T22:00:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "sidecar",
+      "name": "Sidecar",
+      "display_name": "Sidecar",
+      "era": "1920s",
+      "origin": "Paris, France",
+      "story": "Né dans les bars parisiens, cocktail de l'élégance française des Années Folles.",
+      "ingredients": [
+        {
+          "ingredient_id": "brandy",
+          "name": "Brandy",
+          "amount_ml": 50.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "triple_sec",
+          "name": "Triple Sec",
+          "amount_ml": 20.0,
+          "order": 2,
+          "pump_assignment": "auto", 
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "jus_citron",
+          "name": "Jus de citron",
+          "amount_ml": 15.0,
+          "order": 3,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "orange",
+          "name": "Zeste d'orange",
+          "amount": "1 zeste",
+          "order": 4,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Sophistiqué et équilibré, élégance française des années folles",
+        "category": "elegant",
+        "sub_category": "sour",
+        "difficulty": 4,
+        "skill_level": "advanced",
+        "preparation_time": 120,
+        "serving_time": 60,
+        "total_volume_ml": 85.0,
+        "alcohol_content": 28.5,
+        "calories": 165,
+        "glass_type": "coupe",
+        "ice_type": "none",
+        "temperature": "chilled",
+        "garnish": "Zeste d'orange",
+        "garnish_style": "expressed_twist"
+      },
+      "preparation": {
+        "method": "shake",
+        "instructions": [
+          "Refroidir la coupe au congélateur",
+          "Combiner tous les ingrédients liquides dans shaker",
+          "Ajouter glace pilée généreusement",
+          "Secouer vigoureusement 12 secondes",
+          "Double-strainer dans coupe froide",
+          "Exprimer et déposer zeste d'orange"
+        ],
+        "tips": [
+          "Secouer énergiquement pour texture soyeuse",
+          "Verre très froid pour maintenir température",
+          "Équilibre citron/Triple Sec crucial"
+        ],
+        "timing": {
+          "brandy_pour": 3.0,
+          "triple_sec_pour": 2.0,
+          "lemon_pour": 2.0,
+          "shake": 12.0,
+          "strain": 3.0,
+          "garnish": 5.0
+        }
+      },
+      "presentation": {
+        "color_profile": ["pale_yellow", "golden"],
+        "visual_appeal": 9,
+        "aroma_notes": ["orange", "lemon", "cognac", "spice"],
+        "taste_profile": {
+          "sweetness": 5,
+          "sourness": 7,
+          "bitterness": 2,
+          "strength": 7,
+          "complexity": 9
+        }
+      },
+      "images": {
+        "main": "sidecar_main.jpg",
+        "ingredients": "sidecar_ingredients.jpg",
+        "preparation": "sidecar_prep.jpg",
+        "serving": "sidecar_served.jpg",
+        "thumbnail": "sidecar_thumb.jpg"
+      },
+      "popularity": 6,
+      "cost_estimation": 5.80,
+      "profit_margin": 0.78,
+      "allergens": [],
+      "dietary": ["gluten_free"],
+      "mood_tags": ["sophisticated", "elegant", "romantic", "refined"],
+      "weather_tags": ["autumn", "winter", "evening"],
+      "occasion_tags": ["date", "celebration", "formal"],
+      "created_at": "2025-12-07T22:00:00.000Z",
+      "updated_at": "2025-12-07T22:00:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "vodka_cranberry",
+      "name": "Vodka Cranberry",
+      "display_name": "Vodka Cranberry",
+      "era": "1960s-Modern",
+      "origin": "USA",
+      "story": "Cocktail moderne fruité, évolution contemporaine des mélanges prohibition.",
+      "ingredients": [
+        {
+          "ingredient_id": "vodka",
+          "name": "Vodka",
+          "amount_ml": 45.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "jus_cranberry",
+          "name": "Jus de cranberry",
+          "amount_ml": 90.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "citron_vert",
+          "name": "Quartier citron vert",
+          "amount": "1 quartier",
+          "order": 3,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Cocktail fruité et coloré, parfait à toute heure",
+        "category": "modern",
+        "sub_category": "fruity",
+        "difficulty": 1,
+        "skill_level": "beginner",
+        "preparation_time": 30,
+        "serving_time": 20,
+        "total_volume_ml": 135.0,
+        "alcohol_content": 11.7,
+        "calories": 155,
+        "glass_type": "rocks",
+        "ice_type": "cubes",
+        "temperature": "cold",
+        "garnish": "Quartier citron vert",
+        "garnish_style": "wedge"
+      },
+      "preparation": {
+        "method": "build",
+        "instructions": [
+          "Remplir verre rocks de glace",
+          "Verser vodka sur glace",
+          "Ajouter jus de cranberry",
+          "Mélanger légèrement", 
+          "Garnir avec quartier citron vert"
+        ],
+        "tips": [
+          "Jus cranberry bien froid",
+          "Mélange délicat pour préserver couleur",
+          "Presser citron pour acidité"
+        ],
+        "timing": {
+          "vodka_pour": 2.5,
+          "cranberry_pour": 4.0,
+          "stir": 2.0,
+          "garnish": 2.0
+        }
+      },
+      "presentation": {
+        "color_profile": ["ruby_red", "crimson"],
+        "visual_appeal": 8,
+        "aroma_notes": ["cranberry", "tart", "fresh"],
+        "taste_profile": {
+          "sweetness": 6,
+          "sourness": 7,
+          "bitterness": 2,
+          "strength": 4,
+          "complexity": 4
+        }
+      },
+      "images": {
+        "main": "vodka_cranberry_main.jpg",
+        "ingredients": "vodka_cranberry_ingredients.jpg",
+        "preparation": "vodka_cranberry_prep.jpg",
+        "serving": "vodka_cranberry_served.jpg", 
+        "thumbnail": "vodka_cranberry_thumb.jpg"
+      },
+      "popularity": 7,
+      "cost_estimation": 3.10,
+      "profit_margin": 0.72,
+      "allergens": [],
+      "dietary": ["gluten_free", "vegan"],
+      "mood_tags": ["fruity", "fresh", "casual", "social"],
+      "weather_tags": ["summer", "spring", "warm"],
+      "occasion_tags": ["party", "brunch", "casual"],
+      "created_at": "2025-12-07T22:00:00.000Z",
+      "updated_at": "2025-12-07T22:00:00.000Z", 
+      "status": "active"
+    },
+    {
+      "id": "tequila_sunrise",
+      "name": "Tequila Sunrise",
+      "display_name": "Tequila Sunrise",
+      "era": "1970s",
+      "origin": "California, USA",
+      "story": "Lever de soleil en verre, dégradé spectaculaire digne des couchers californiens.",
+      "ingredients": [
+        {
+          "ingredient_id": "tequila",
+          "name": "Tequila",
+          "amount_ml": 45.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "jus_orange",
+          "name": "Jus d'orange",
+          "amount_ml": 90.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "grenadine",
+          "name": "Grenadine",
+          "amount_ml": 10.0,
+          "order": 3,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false,
+          "technique": "float"
+        },
+        {
+          "ingredient_id": "orange",
+          "name": "Rondelle d'orange",
+          "amount": "1 rondelle",
+          "order": 4,
+          "essential": false,
+          "garnish": true
+        },
+        {
+          "ingredient_id": "cerise",
+          "name": "Cerise",
+          "amount": "1 cerise",
+          "order": 5,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Magnifique dégradé de couleurs, goût tropical californien",
+        "category": "tropical",
+        "sub_category": "layered",
+        "difficulty": 3,
+        "skill_level": "intermediate",
+        "preparation_time": 90,
+        "serving_time": 45,
+        "total_volume_ml": 145.0,
+        "alcohol_content": 11.2,
+        "calories": 180,
+        "glass_type": "highball",
+        "ice_type": "cubes",
+        "temperature": "cold",
+        "garnish": "Orange et cerise",
+        "garnish_style": "tropical"
+      },
+      "preparation": {
+        "method": "build_layered",
+        "instructions": [
+          "Remplir verre highball de glace",
+          "Verser tequila lentement",
+          "Ajouter jus d'orange en mélangeant légèrement",
+          "Verser grenadine très lentement le long du verre",
+          "Observer formation du dégradé naturel",
+          "Garnir avec orange et cerise sur pique"
+        ],
+        "tips": [
+          "Grenadine lourde coule naturellement",
+          "Verser très lentement pour effet stratifié",
+          "Ne pas mélanger après grenadine"
+        ],
+        "timing": {
+          "tequila_pour": 3.0,
+          "orange_pour": 4.0,
+          "grenadine_float": 8.0,
+          "garnish": 5.0
+        }
+      },
+      "presentation": {
+        "color_profile": ["orange", "red", "gradient"],
+        "visual_appeal": 10,
+        "aroma_notes": ["orange", "agave", "pomegranate", "tropical"],
+        "taste_profile": {
+          "sweetness": 7,
+          "sourness": 4,
+          "bitterness": 1,
+          "strength": 4,
+          "complexity": 6
+        }
+      },
+      "images": {
+        "main": "tequila_sunrise_main.jpg",
+        "ingredients": "tequila_sunrise_ingredients.jpg",
+        "preparation": "tequila_sunrise_prep.jpg",
+        "serving": "tequila_sunrise_served.jpg",
+        "thumbnail": "tequila_sunrise_thumb.jpg"
+      },
+      "popularity": 8,
+      "cost_estimation": 4.15,
+      "profit_margin": 0.76,
+      "allergens": [],
+      "dietary": ["gluten_free"],
+      "mood_tags": ["tropical", "colorful", "festive", "vacation"],
+      "weather_tags": ["summer", "hot", "vacation"],
+      "occasion_tags": ["party", "vacation", "poolside"],
+      "created_at": "2025-12-07T22:00:00.000Z",
+      "updated_at": "2025-12-07T22:00:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "rum_cola",
+      "name": "Rum & Cola",
+      "display_name": "Rum & Cola",
+      "era": "1900s-Present",
+      "origin": "Cuba",
+      "story": "Cuba Libre simplifié, symbole de liberté et de la culture caraibéenne.",
+      "ingredients": [
+        {
+          "ingredient_id": "rhum",
+          "name": "Rhum",
+          "amount_ml": 50.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "coca_cola",
+          "name": "Coca Cola",
+          "amount_ml": 120.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "citron_vert",
+          "name": "Quartier citron vert",
+          "amount": "1 quartier",
+          "order": 3,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Classique intemporel, Cuba Libre version simple et authentique",
+        "category": "classic",
+        "sub_category": "highball",
+        "difficulty": 1,
+        "skill_level": "beginner",
+        "preparation_time": 30,
+        "serving_time": 20,
+        "total_volume_ml": 170.0,
+        "alcohol_content": 11.8,
+        "calories": 190,
+        "glass_type": "highball",
+        "ice_type": "cubes",
+        "temperature": "cold",
+        "garnish": "Quartier citron vert",
+        "garnish_style": "wedge"
+      },
+      "preparation": {
+        "method": "build",
+        "instructions": [
+          "Remplir verre highball de glace fraîche",
+          "Verser rhum directement sur glace",
+          "Ajouter Coca Cola froid lentement",
+          "Mélanger délicatement une fois",
+          "Garnir avec quartier citron vert"
+        ],
+        "tips": [
+          "Coca Cola très froid pour préserver bulles",
+          "Mélange minimal pour garder pétillant",
+          "Presser légèrement citron avant service"
+        ],
+        "timing": {
+          "rum_pour": 3.0,
+          "cola_pour": 5.0,
+          "stir": 1.5,
+          "garnish": 2.0
+        }
+      },
+      "presentation": {
+        "color_profile": ["dark_brown", "caramel"],
+        "visual_appeal": 7,
+        "aroma_notes": ["rum", "cola", "vanilla", "caramel"],
+        "taste_profile": {
+          "sweetness": 7,
+          "sourness": 2,
+          "bitterness": 1,
+          "strength": 4,
+          "complexity": 3
+        }
+      },
+      "images": {
+        "main": "rum_cola_main.jpg",
+        "ingredients": "rum_cola_ingredients.jpg",
+        "preparation": "rum_cola_prep.jpg",
+        "serving": "rum_cola_served.jpg",
+        "thumbnail": "rum_cola_thumb.jpg"
+      },
+      "popularity": 9,
+      "cost_estimation": 2.95,
+      "profit_margin": 0.74,
+      "allergens": ["caffeine"],
+      "dietary": ["gluten_free"],
+      "mood_tags": ["casual", "relaxed", "tropical", "familiar"],
+      "weather_tags": ["summer", "warm", "any"],
+      "occasion_tags": ["casual", "party", "everyday"],
+      "created_at": "2025-12-07T22:00:00.000Z",
+      "updated_at": "2025-12-07T22:00:00.000Z",
+      "status": "active"
+    }
+  ]
+}
