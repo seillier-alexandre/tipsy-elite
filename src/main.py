@@ -276,7 +276,7 @@ def main():
     parser = argparse.ArgumentParser(description="Tipsy Elite - Machine à Cocktails")
     parser.add_argument("--demo", action="store_true", 
                        help="Lance en mode démo (sans hardware)")
-    parser.add_argument("--async", action="store_true",
+    parser.add_argument("--async-mode", action="store_true",
                        help="Lance en mode asynchrone")
     parser.add_argument("--debug", action="store_true",
                        help="Active le mode debug")
@@ -305,7 +305,7 @@ def main():
         signal.signal(signal.SIGTERM, signal_handler)
         
         # Démarrage
-        if args.async:
+        if args.async_mode:
             system.run_async()
         else:
             system.run()
