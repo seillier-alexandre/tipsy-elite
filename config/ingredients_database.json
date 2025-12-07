@@ -105,6 +105,111 @@
         "storage_temp": "room",
         "shelf_life_days": 1825,
         "description": "Liqueur d'orange triple distillée, note d'agrumes"
+      },
+      "amaretto": {
+        "id": "amaretto",
+        "name": "Amaretto",
+        "type": "liqueur",
+        "category": "spirits",
+        "color": "#8B4513",
+        "alcohol_content": 24.0,
+        "density": 1.08,
+        "pump_flow_rate": 20.0,
+        "cost_per_ml": 0.06,
+        "suppliers": ["Disaronno", "Lazzaroni", "Luxardo"],
+        "storage_temp": "room",
+        "shelf_life_days": 1825,
+        "description": "Liqueur italienne d'amande douce, douceur authentique"
+      },
+      "campari": {
+        "id": "campari",
+        "name": "Campari",
+        "type": "bitter",
+        "category": "spirits",
+        "color": "#DC143C",
+        "alcohol_content": 25.0,
+        "density": 1.05,
+        "pump_flow_rate": 22.0,
+        "cost_per_ml": 0.08,
+        "suppliers": ["Campari Group"],
+        "storage_temp": "room",
+        "shelf_life_days": 1825,
+        "description": "Bitter italien iconique, amertume sophistiquée"
+      },
+      "vermouth_rouge": {
+        "id": "vermouth_rouge",
+        "name": "Vermouth rouge",
+        "type": "fortified_wine",
+        "category": "spirits",
+        "color": "#8B0000",
+        "alcohol_content": 16.0,
+        "density": 1.02,
+        "pump_flow_rate": 25.0,
+        "cost_per_ml": 0.05,
+        "suppliers": ["Martini & Rossi", "Cinzano", "Dolin"],
+        "storage_temp": "cold",
+        "shelf_life_days": 60,
+        "description": "Vermouth italien rouge, complexité aromatique"
+      },
+      "vermouth_blanc": {
+        "id": "vermouth_blanc",
+        "name": "Vermouth blanc sec",
+        "type": "fortified_wine",
+        "category": "spirits",
+        "color": "#F5F5DC",
+        "alcohol_content": 15.0,
+        "density": 1.01,
+        "pump_flow_rate": 25.0,
+        "cost_per_ml": 0.05,
+        "suppliers": ["Noilly Prat", "Dolin", "Martini"],
+        "storage_temp": "cold",
+        "shelf_life_days": 60,
+        "description": "Vermouth français sec, finesse herbacée"
+      },
+      "rhum_blanc": {
+        "id": "rhum_blanc",
+        "name": "Rhum blanc",
+        "type": "spirit",
+        "category": "spirits",
+        "color": "#FFFFFF",
+        "alcohol_content": 40.0,
+        "density": 0.95,
+        "pump_flow_rate": 25.0,
+        "cost_per_ml": 0.04,
+        "suppliers": ["Havana Club", "Bacardi", "Mount Gay"],
+        "storage_temp": "room",
+        "shelf_life_days": 3650,
+        "description": "Rhum blanc pur, essence caraibéenne cristalline"
+      },
+      "liqueur_violette": {
+        "id": "liqueur_violette",
+        "name": "Liqueur de violette",
+        "type": "liqueur",
+        "category": "spirits",
+        "color": "#8A2BE2",
+        "alcohol_content": 20.0,
+        "density": 1.10,
+        "pump_flow_rate": 18.0,
+        "cost_per_ml": 0.12,
+        "suppliers": ["Crème de Violette", "Rothman & Winter"],
+        "storage_temp": "room",
+        "shelf_life_days": 1825,
+        "description": "Liqueur florale délicate, parfum de violette"
+      },
+      "miel": {
+        "id": "miel",
+        "name": "Miel",
+        "type": "syrup",
+        "category": "syrups",
+        "color": "#FFB90F",
+        "alcohol_content": 0.0,
+        "density": 1.40,
+        "pump_flow_rate": 15.0,
+        "cost_per_ml": 0.08,
+        "suppliers": ["Local", "Acacia", "Lavande"],
+        "storage_temp": "room",
+        "shelf_life_days": 365,
+        "description": "Miel naturel, douceur authentique et florale"
       }
     },
     "juices": {
@@ -152,6 +257,21 @@
         "storage_temp": "cold",
         "shelf_life_days": 3,
         "description": "Jus de citron fraîchement pressé, acidité parfaite"
+      },
+      "jus_citron_vert": {
+        "id": "jus_citron_vert",
+        "name": "Jus de citron vert",
+        "type": "juice",
+        "category": "juices",
+        "color": "#32CD32",
+        "alcohol_content": 0.0,
+        "density": 1.03,
+        "pump_flow_rate": 28.0,
+        "cost_per_ml": 0.05,
+        "suppliers": ["Fraîcheur tropicale", "Rose's", "Réal"],
+        "storage_temp": "cold",
+        "shelf_life_days": 3,
+        "description": "Jus de citron vert fraîchement pressé, acidité tropicale"
       }
     },
     "mixers": {
@@ -269,6 +389,18 @@
         "storage_temp": "room",
         "shelf_life_days": 730,
         "description": "Cerises au marasquin, touche élégante finale"
+      },
+      "olive": {
+        "id": "olive",
+        "name": "Olive",
+        "type": "garnish",
+        "category": "garnish",
+        "color": "#6B8E23",
+        "alcohol_content": 0.0,
+        "cost_per_unit": 0.20,
+        "storage_temp": "cold",
+        "shelf_life_days": 365,
+        "description": "Olive verte méditerranéenne, classique du martini"
       }
     }
   },

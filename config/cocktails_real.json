@@ -1,0 +1,566 @@
+{
+  "metadata": {
+    "version": "2.1.0",
+    "last_updated": "2025-12-07T22:30:00.000Z",
+    "total_cocktails": 10,
+    "categories": ["classic", "modern", "prohibition", "elegant", "sour"],
+    "difficulty_levels": [1, 2, 3, 4, 5],
+    "glass_types": ["rocks", "coupe", "martini", "old_fashioned", "sour"],
+    "image_base_path": "assets/images/cocktails/",
+    "default_image": "default_cocktail.png",
+    "description": "Collection de cocktails réels avec vraies images - Style Art Déco"
+  },
+  "cocktails": [
+    {
+      "id": "negroni",
+      "name": "Negroni",
+      "display_name": "Negroni",
+      "era": "1919",
+      "origin": "Florence, Italie",
+      "story": "Créé au Caffè Casoni à Florence par le Comte Camillo Negroni, ce cocktail italien emblématique incarne l'amertume sophistiquée.",
+      "ingredients": [
+        {
+          "ingredient_id": "gin",
+          "name": "Gin",
+          "amount_ml": 30.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "campari",
+          "name": "Campari",
+          "amount_ml": 30.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "vermouth_rouge",
+          "name": "Vermouth rouge",
+          "amount_ml": 30.0,
+          "order": 3,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "orange",
+          "name": "Zeste d'orange",
+          "amount": "1 zeste",
+          "order": 4,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Cocktail italien amer et sophistiqué, équilibre parfait",
+        "category": "classic",
+        "sub_category": "aperitif",
+        "difficulty": 2,
+        "skill_level": "intermediate",
+        "preparation_time": 60,
+        "serving_time": 30,
+        "total_volume_ml": 90.0,
+        "alcohol_content": 24.0,
+        "calories": 155,
+        "glass_type": "rocks",
+        "ice_type": "large_cube",
+        "temperature": "chilled",
+        "garnish": "Zeste d'orange",
+        "garnish_style": "expressed_twist"
+      },
+      "preparation": {
+        "method": "stir",
+        "instructions": [
+          "Placer un gros glaçon dans le verre",
+          "Verser gin, Campari et vermouth rouge",
+          "Remuer délicatement 15 tours",
+          "Exprimer le zeste d'orange",
+          "Déposer le zeste dans le verre"
+        ],
+        "tips": [
+          "Proportions égales pour équilibre parfait",
+          "Gros glaçon pour dilution contrôlée",
+          "Exprimer généreusement le zeste"
+        ]
+      },
+      "presentation": {
+        "color_profile": ["ruby_red", "deep_red"],
+        "visual_appeal": 9,
+        "aroma_notes": ["orange", "herbs", "bitter", "juniper"],
+        "taste_profile": {
+          "sweetness": 3,
+          "sourness": 2,
+          "bitterness": 8,
+          "strength": 7,
+          "complexity": 9
+        }
+      },
+      "images": {
+        "main": "negroni.JPG",
+        "thumbnail": "negroni.JPG"
+      },
+      "popularity": 9,
+      "cost_estimation": 4.50,
+      "profit_margin": 0.78,
+      "allergens": [],
+      "dietary": ["vegan"],
+      "mood_tags": ["sophisticated", "bitter", "aperitif", "Italian"],
+      "weather_tags": ["autumn", "winter", "evening"],
+      "occasion_tags": ["aperitif", "dinner", "sophisticated"],
+      "created_at": "2025-12-07T22:30:00.000Z",
+      "updated_at": "2025-12-07T22:30:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "manhattan",
+      "name": "Manhattan",
+      "display_name": "Manhattan",
+      "era": "1880s",
+      "origin": "New York, USA",
+      "story": "Né au Manhattan Club de New York, ce cocktail incarne l'élégance urbaine de l'âge doré américain.",
+      "ingredients": [
+        {
+          "ingredient_id": "whisky",
+          "name": "Whisky",
+          "amount_ml": 60.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "vermouth_rouge",
+          "name": "Vermouth rouge",
+          "amount_ml": 20.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true,
+          "substitutable": false
+        },
+        {
+          "ingredient_id": "cerise",
+          "name": "Cerise au marasquin",
+          "amount": "1 cerise",
+          "order": 3,
+          "essential": false,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Cocktail new-yorkais sophistiqué, élégance urbaine",
+        "category": "classic",
+        "sub_category": "spirit_forward",
+        "difficulty": 3,
+        "skill_level": "intermediate",
+        "preparation_time": 75,
+        "serving_time": 45,
+        "total_volume_ml": 80.0,
+        "alcohol_content": 30.0,
+        "calories": 185,
+        "glass_type": "coupe",
+        "ice_type": "none",
+        "temperature": "chilled",
+        "garnish": "Cerise au marasquin",
+        "garnish_style": "cherry_pick"
+      },
+      "presentation": {
+        "color_profile": ["amber", "mahogany"],
+        "visual_appeal": 9,
+        "aroma_notes": ["whiskey", "vermouth", "cherry", "spice"],
+        "taste_profile": {
+          "sweetness": 4,
+          "sourness": 2,
+          "bitterness": 3,
+          "strength": 8,
+          "complexity": 8
+        }
+      },
+      "images": {
+        "main": "manhattan.JPG",
+        "thumbnail": "manhattan.JPG"
+      },
+      "popularity": 8,
+      "cost_estimation": 5.20,
+      "profit_margin": 0.80,
+      "mood_tags": ["sophisticated", "strong", "urban", "classic"],
+      "weather_tags": ["winter", "autumn", "evening"],
+      "occasion_tags": ["after_dinner", "business", "celebration"],
+      "status": "active"
+    },
+    {
+      "id": "sidecar",
+      "name": "Sidecar",
+      "display_name": "Sidecar",
+      "era": "1920s",
+      "origin": "Paris, France",
+      "story": "Né dans les bars parisiens pendant les Années Folles, symbole de l'élégance française et de la sophistication.",
+      "ingredients": [
+        {
+          "ingredient_id": "brandy",
+          "name": "Brandy",
+          "amount_ml": 50.0,
+          "order": 1,
+          "pump_assignment": "auto",
+          "essential": true
+        },
+        {
+          "ingredient_id": "triple_sec",
+          "name": "Triple Sec",
+          "amount_ml": 20.0,
+          "order": 2,
+          "pump_assignment": "auto",
+          "essential": true
+        },
+        {
+          "ingredient_id": "jus_citron",
+          "name": "Jus de citron",
+          "amount_ml": 15.0,
+          "order": 3,
+          "pump_assignment": "auto",
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Sophistiqué et équilibré, élégance française des années folles",
+        "category": "elegant",
+        "difficulty": 4,
+        "total_volume_ml": 85.0,
+        "alcohol_content": 28.5,
+        "glass_type": "coupe"
+      },
+      "images": {
+        "main": "sidecar.JPG",
+        "thumbnail": "sidecar.JPG"
+      },
+      "popularity": 7,
+      "mood_tags": ["sophisticated", "elegant", "French", "refined"],
+      "status": "active"
+    },
+    {
+      "id": "dry_martini",
+      "name": "Dry Martini",
+      "display_name": "Dry Martini",
+      "era": "1900s",
+      "origin": "San Francisco, USA",
+      "story": "Le roi absolu des cocktails, symbole de sophistication et d'élégance intemporelle, popularisé par James Bond.",
+      "ingredients": [
+        {
+          "ingredient_id": "gin",
+          "name": "Gin",
+          "amount_ml": 75.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "vermouth_blanc",
+          "name": "Vermouth blanc sec",
+          "amount_ml": 10.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "olive",
+          "name": "Olive",
+          "amount": "1 olive",
+          "order": 3,
+          "garnish": true
+        }
+      ],
+      "recipe": {
+        "description": "Le roi des cocktails, sophistication absolue",
+        "category": "classic",
+        "difficulty": 5,
+        "total_volume_ml": 85.0,
+        "alcohol_content": 32.0,
+        "glass_type": "martini"
+      },
+      "images": {
+        "main": "dry-martini.JPG",
+        "thumbnail": "dry-martini.JPG"
+      },
+      "popularity": 10,
+      "mood_tags": ["sophisticated", "iconic", "strong", "elegant"],
+      "status": "active"
+    },
+    {
+      "id": "boulevardier",
+      "name": "Boulevardier",
+      "display_name": "Boulevardier",
+      "era": "1927",
+      "origin": "Paris, France",
+      "story": "Créé par Erskine Gwynne, éditeur du magazine 'Boulevardier' à Paris. Version whisky du Negroni, cocktail des expatriés américains.",
+      "ingredients": [
+        {
+          "ingredient_id": "whisky",
+          "name": "Whisky bourbon",
+          "amount_ml": 45.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "campari",
+          "name": "Campari",
+          "amount_ml": 30.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "vermouth_rouge",
+          "name": "Vermouth rouge",
+          "amount_ml": 30.0,
+          "order": 3,
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Negroni au whisky, sophistication parisienne des années 20",
+        "category": "prohibition",
+        "difficulty": 3,
+        "total_volume_ml": 105.0,
+        "alcohol_content": 26.0,
+        "glass_type": "rocks"
+      },
+      "images": {
+        "main": "boulevardier.JPG",
+        "thumbnail": "boulevardier.JPG"
+      },
+      "popularity": 6,
+      "mood_tags": ["sophisticated", "bitter", "Parisian", "prohibition"],
+      "status": "active"
+    },
+    {
+      "id": "whiskey_sour",
+      "name": "Whiskey Sour",
+      "display_name": "Whiskey Sour",
+      "era": "1870s",
+      "origin": "USA",
+      "story": "Cocktail américain authentique, équilibre parfait entre force du whisky et fraîcheur acidulée du citron.",
+      "ingredients": [
+        {
+          "ingredient_id": "whisky",
+          "name": "Whisky bourbon",
+          "amount_ml": 60.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "jus_citron",
+          "name": "Jus de citron frais",
+          "amount_ml": 25.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "sirop_simple",
+          "name": "Sirop simple",
+          "amount_ml": 15.0,
+          "order": 3,
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Équilibre parfait whisky-citron, classique américain",
+        "category": "sour",
+        "difficulty": 2,
+        "total_volume_ml": 100.0,
+        "alcohol_content": 22.0,
+        "glass_type": "sour"
+      },
+      "images": {
+        "main": "whiskey-sour.JPG",
+        "thumbnail": "whiskey-sour.JPG"
+      },
+      "popularity": 8,
+      "mood_tags": ["refreshing", "balanced", "American", "classic"],
+      "status": "active"
+    },
+    {
+      "id": "amaretto_sour",
+      "name": "Amaretto Sour",
+      "display_name": "Amaretto Sour",
+      "era": "1970s",
+      "origin": "USA",
+      "story": "Version moderne et douce du Sour, popularisée dans les années 70, alliance parfaite entre amande italienne et citron.",
+      "ingredients": [
+        {
+          "ingredient_id": "amaretto",
+          "name": "Amaretto",
+          "amount_ml": 50.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "jus_citron",
+          "name": "Jus de citron frais",
+          "amount_ml": 25.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "sirop_simple",
+          "name": "Sirop simple",
+          "amount_ml": 10.0,
+          "order": 3,
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Douceur amandée italienne et fraîcheur citronnée",
+        "category": "sour",
+        "difficulty": 1,
+        "total_volume_ml": 85.0,
+        "alcohol_content": 18.0,
+        "glass_type": "sour"
+      },
+      "images": {
+        "main": "amaretto-sour.JPG",
+        "thumbnail": "amaretto-sour.JPG"
+      },
+      "popularity": 7,
+      "mood_tags": ["sweet", "smooth", "Italian", "mellow"],
+      "status": "active"
+    },
+    {
+      "id": "daiquiri",
+      "name": "Daiquiri",
+      "display_name": "Daiquiri",
+      "era": "1898",
+      "origin": "Cuba",
+      "story": "Né dans les mines de Daiquiri à Cuba, ce cocktail simple et parfait incarne la pureté tropicale cubaine.",
+      "ingredients": [
+        {
+          "ingredient_id": "rhum_blanc",
+          "name": "Rhum blanc",
+          "amount_ml": 60.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "jus_citron_vert",
+          "name": "Jus de citron vert",
+          "amount_ml": 20.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "sirop_simple",
+          "name": "Sirop simple",
+          "amount_ml": 15.0,
+          "order": 3,
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Pureté cubaine, équilibre rhum-citron vert parfait",
+        "category": "classic",
+        "difficulty": 3,
+        "total_volume_ml": 95.0,
+        "alcohol_content": 20.0,
+        "glass_type": "coupe"
+      },
+      "images": {
+        "main": "daiquiri.JPG",
+        "thumbnail": "daiquiri.JPG"
+      },
+      "popularity": 8,
+      "mood_tags": ["tropical", "pure", "Cuban", "refreshing"],
+      "status": "active"
+    },
+    {
+      "id": "crocus_club",
+      "name": "Crocus Club",
+      "display_name": "Crocus Club",
+      "era": "Modern",
+      "origin": "Création contemporaine",
+      "story": "Cocktail moderne sophistiqué, création contemporaine alliant tradition et innovation dans l'esprit des clubs privés.",
+      "ingredients": [
+        {
+          "ingredient_id": "gin",
+          "name": "Gin",
+          "amount_ml": 50.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "liqueur_violette",
+          "name": "Liqueur de violette",
+          "amount_ml": 15.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "jus_citron",
+          "name": "Jus de citron",
+          "amount_ml": 20.0,
+          "order": 3,
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Création moderne florale et sophistiquée",
+        "category": "modern",
+        "difficulty": 4,
+        "total_volume_ml": 85.0,
+        "alcohol_content": 25.0,
+        "glass_type": "coupe"
+      },
+      "images": {
+        "main": "crocus.club.JPG",
+        "thumbnail": "crocus.club.JPG"
+      },
+      "popularity": 5,
+      "mood_tags": ["floral", "modern", "sophisticated", "unique"],
+      "status": "active"
+    },
+    {
+      "id": "papa_bear",
+      "name": "Papa Bear",
+      "display_name": "Papa Bear",
+      "era": "Modern",
+      "origin": "Création contemporaine",
+      "story": "Cocktail moderne chaleureux et réconfortant, évoquant la force paternelle et la protection bienveillante.",
+      "ingredients": [
+        {
+          "ingredient_id": "whisky",
+          "name": "Whisky",
+          "amount_ml": 50.0,
+          "order": 1,
+          "essential": true
+        },
+        {
+          "ingredient_id": "miel",
+          "name": "Miel",
+          "amount_ml": 15.0,
+          "order": 2,
+          "essential": true
+        },
+        {
+          "ingredient_id": "jus_citron",
+          "name": "Jus de citron",
+          "amount_ml": 10.0,
+          "order": 3,
+          "essential": true
+        }
+      ],
+      "recipe": {
+        "description": "Chaleureux et réconfortant, notes de miel",
+        "category": "modern",
+        "difficulty": 2,
+        "total_volume_ml": 75.0,
+        "alcohol_content": 24.0,
+        "glass_type": "rocks"
+      },
+      "images": {
+        "main": "papa-bear.JPG",
+        "thumbnail": "papa-bear.JPG"
+      },
+      "popularity": 6,
+      "mood_tags": ["warming", "comforting", "honey", "paternal"],
+      "status": "active"
+    }
+  ]
+}

@@ -228,13 +228,30 @@ class ImageManager:
     def load_cocktail_image(self, cocktail_id: str, image_type: str = 'main',
                            size: Optional[Tuple[int, int]] = None) -> pygame.Surface:
         """Charge l'image d'un cocktail spécifique"""
+        # Noms de fichiers basés sur les vraies images
+        cocktail_filenames = {
+            'negroni': 'negroni.JPG',
+            'manhattan': 'manhattan.JPG', 
+            'sidecar': 'sidecar.JPG',
+            'dry_martini': 'dry-martini.JPG',
+            'boulevardier': 'boulevardier.JPG',
+            'whiskey_sour': 'whiskey-sour.JPG',
+            'amaretto_sour': 'amaretto-sour.JPG',
+            'daiquiri': 'daiquiri.JPG',
+            'crocus_club': 'crocus.club.JPG',
+            'papa_bear': 'papa-bear.JPG'
+        }
+        
+        # Récupérer le nom de fichier réel
+        filename = cocktail_filenames.get(cocktail_id, f"{cocktail_id}.JPG")
+        
         # Mapping des types d'images
         type_mapping = {
-            'main': f"cocktails/{cocktail_id}_main.jpg",
-            'thumb': f"cocktails/thumbnails/{cocktail_id}_thumb.png", 
-            'ingredients': f"cocktails/ingredients/{cocktail_id}_ingredients.jpg",
-            'preparation': f"cocktails/preparation/{cocktail_id}_prep.jpg",
-            'serving': f"cocktails/serving/{cocktail_id}_served.jpg"
+            'main': f"cocktails/{filename}",
+            'thumb': f"cocktails/{filename}",  # Utiliser la même image pour thumbnail
+            'ingredients': f"cocktails/ingredients/{filename}",
+            'preparation': f"cocktails/preparation/{filename}",
+            'serving': f"cocktails/serving/{filename}"
         }
         
         image_path = type_mapping.get(image_type, type_mapping['main'])

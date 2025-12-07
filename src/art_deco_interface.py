@@ -807,7 +807,45 @@ class CocktailCarousel:
         img_x = (int(self.card_width * scale) - img_width) // 2
         img_y = int(80 * scale)
         
-        # Fond image temporaire (remplacer par vraie image)
+        # Charger la vraie image du cocktail
+        try:
+            # Import conditionnel de l'ImageManager
+            from image_manager import get_image_manager
+            
+            cocktail_id = cocktail.get('id', '')
+            if cocktail_id:
+                image_manager = get_image_manager()
+                cocktail_image = image_manager.load_cocktail_image(
+                    cocktail_id, 'main', (img_width, img_height)
+                )
+                
+                # Créer un masque circulaire pour l'image
+                mask_surface = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
+                pygame.draw.ellipse(mask_surface, (255, 255, 255, 255), (0, 0, img_width, img_height))
+                
+                # Appliquer le masque à l'image
+                masked_image = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
+                masked_image.blit(cocktail_image, (0, 0))
+                masked_image.blit(mask_surface, (0, 0), special_flags=pygame.BLEND_ALPHA_SDL2)
+                
+                # Dessiner l'image masquée
+                surface.blit(masked_image, (img_x, img_y))
+                
+                # Bordure dorée autour
+                pygame.draw.ellipse(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=3)
+                pygame.draw.ellipse(surface, Colors.BRONZE, (img_x-5, img_y-5, img_width+10, img_height+10), width=1)
+                
+                # Reflet style verre par-dessus
+                highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
+                highlight.fill((*Colors.CREAM, 40))
+                surface.blit(highlight, (img_x + img_width//4, img_y + img_height//6))
+                
+                return  # Image chargée avec succès
+        
+        except Exception as e:
+            logger.debug(f"Erreur chargement image cocktail {cocktail.get('id', 'inconnu')}: {e}")
+        
+        # Fallback : fond coloré temporaire si image non disponible
         img_color = self._get_cocktail_color(cocktail)
         pygame.draw.ellipse(surface, img_color, (img_x, img_y, img_width, img_height))
         pygame.draw.ellipse(surface, Colors.GOLD, (img_x, img_y, img_width, img_height), width=2)

@@ -166,7 +166,7 @@ class CocktailRecipe:
 class CocktailDatabase:
     """Base de données des cocktails avec persistance JSON et support images"""
     
-    def __init__(self, db_path: str = "config/cocktails_complete.json", 
+    def __init__(self, db_path: str = "config/cocktails_real.json", 
                  ingredients_db_path: str = "config/ingredients_database.json"):
         self.db_path = Path(db_path)
         self.ingredients_db_path = Path(ingredients_db_path)
