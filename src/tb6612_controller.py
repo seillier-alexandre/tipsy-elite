@@ -7,12 +7,20 @@ Architecture haute performance et sécurisée
 import logging
 import time
 import threading
-import signal
-import atexit
-import sys
 from typing import Dict, Optional
 from contextlib import contextmanager
 from dataclasses import dataclass
+
+# Imports optionnels pour gestion signaux
+try:
+    import signal
+    import atexit
+    import sys
+    SIGNAL_SUPPORT = True
+except ImportError:
+    SIGNAL_SUPPORT = False
+    logger = logging.getLogger(__name__)
+    logger.warning("Modules signal/atexit/sys non disponibles")
 
 try:
     import RPi.GPIO as GPIO
@@ -519,7 +527,13 @@ def signal_handler(signum, _frame):
     cleanup_pump_system()
     sys.exit(0)
 
-# Enregistrement des gestionnaires
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
-atexit.register(cleanup_pump_system)
+# Enregistrement des gestionnaires (seulement si support disponible)
+if SIGNAL_SUPPORT:
+    try:
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        atexit.register(cleanup_pump_system)
+    except (NameError, AttributeError) as e:
+        logger.warning(f"Impossible d'enregistrer les gestionnaires de signaux: {e}")
+else:
+    logger.info("Gestionnaires de signaux non configurés (modules non disponibles)")
