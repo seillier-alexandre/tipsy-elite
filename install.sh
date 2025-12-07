@@ -17,8 +17,14 @@ echo "[INSTALL] Installation des dépendances..."
 sudo apt update
 sudo apt install -y python3-pygame python3-rpi.gpio python3-spidev python3-pip
 
-# Installer les packages Python
-pip3 install --user pygame RPi.GPIO spidev
+# Installer les packages Python (si dans un venv)
+if [[ "$VIRTUAL_ENV" != "" ]]; then
+    echo "[INFO] Environnement virtuel détecté: $VIRTUAL_ENV"
+    pip install pygame RPi.GPIO spidev
+else
+    echo "[INFO] Installation système des packages Python"
+    # Les packages sont déjà installés via apt
+fi
 
 # Créer le service systemd
 echo "[INSTALL] Création du service systemd..."
@@ -31,7 +37,7 @@ After=network.target
 Type=simple
 User=$USER_NAME
 WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/bin/python3 src/main.py
+ExecStart=$INSTALL_DIR/venv/bin/python src/main.py
 Restart=always
 RestartSec=10
 Environment=DISPLAY=:0
