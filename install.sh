@@ -46,10 +46,34 @@ Environment=DISPLAY=:0
 WantedBy=multi-user.target
 EOF
 
-# Activer le service
-echo "[INSTALL] Activation du service..."
+# Configurer l'auto-login
+echo "[INSTALL] Configuration auto-login..."
+sudo systemctl set-default graphical.target
+sudo systemctl enable lightdm.service
+
+# Configurer l'auto-login pour l'utilisateur
+sudo mkdir -p /etc/lightdm/lightdm.conf.d/
+sudo tee /etc/lightdm/lightdm.conf.d/12-autologin.conf > /dev/null << EOF
+[Seat:*]
+autologin-user=$USER_NAME
+autologin-user-timeout=0
+EOF
+
+# Créer le script de démarrage automatique
+mkdir -p /home/$USER_NAME/.config/autostart
+tee /home/$USER_NAME/.config/autostart/tipsy-elite.desktop > /dev/null << EOF
+[Desktop Entry]
+Type=Application
+Name=Tipsy Elite
+Exec=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/src/main.py
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+EOF
+
+# Ne pas activer le service systemd (on utilise autostart à la place)
+echo "[INSTALL] Configuration du démarrage graphique..."
 sudo systemctl daemon-reload
-sudo systemctl enable tipsy-elite.service
 
 # Créer le script de gestion
 echo "[INSTALL] Création des scripts de gestion..."
