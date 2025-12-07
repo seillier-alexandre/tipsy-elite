@@ -182,127 +182,121 @@ class CocktailDatabase:
         """Crée une base de données par défaut avec des cocktails classiques"""
         logger.info("Création base de données par défaut")
         
-        # Cocktails classiques des années 1920
+        # Cocktails adaptés aux pompes disponibles
         default_cocktails = [
             {
-                'id': 'old_fashioned',
-                'name': 'Old Fashioned',
+                'id': 'gin_tonic',
+                'name': 'Gin Tonic',
                 'ingredients': [
-                    {'name': 'Whisky', 'amount_ml': 60, 'category': 'spirits'},
-                    {'name': 'Simple syrup', 'amount_ml': 5, 'category': 'syrups'},
-                    {'name': 'Bitters', 'amount_ml': 2, 'category': 'syrups'}
+                    {'name': 'Gin', 'amount_ml': 50, 'category': 'spirits'},
+                    {'name': 'Sprite', 'amount_ml': 100, 'category': 'mixers'}
                 ],
-                'description': 'Le roi des cocktails, symbole de l\'élégance prohibition',
+                'description': 'Classique rafraîchissant, simple et élégant',
                 'category': 'classic',
-                'difficulty': 2,
-                'glass_type': 'rocks',
-                'garnish': 'Orange peel',
+                'difficulty': 1,
+                'glass_type': 'highball',
+                'garnish': 'Citron vert',
                 'instructions': [
-                    'Verser le whisky dans le verre',
-                    'Ajouter le sirop et les bitters',
+                    'Verser le gin sur glace',
+                    'Compléter avec Sprite',
                     'Mélanger délicatement',
-                    'Garnir avec le zeste d\'orange'
+                    'Garnir avec citron vert'
                 ]
             },
             {
-                'id': 'gin_fizz',
-                'name': 'Gin Fizz',
+                'id': 'vodka_cranberry',
+                'name': 'Vodka Cranberry',
                 'ingredients': [
-                    {'name': 'Gin', 'amount_ml': 45, 'category': 'spirits'},
-                    {'name': 'Jus de citron', 'amount_ml': 20, 'category': 'juices'},
-                    {'name': 'Simple syrup', 'amount_ml': 10, 'category': 'syrups'},
-                    {'name': 'Eau gazeuse', 'amount_ml': 50, 'category': 'mixers'}
+                    {'name': 'Vodka', 'amount_ml': 45, 'category': 'spirits'},
+                    {'name': 'Jus de cranberry', 'amount_ml': 90, 'category': 'juices'}
                 ],
-                'description': 'Rafraîchissant et élégant, parfait pour les soirées chaudes',
+                'description': 'Cocktail fruité et coloré, parfait à toute heure',
+                'category': 'modern',
+                'difficulty': 1,
+                'glass_type': 'rocks',
+                'garnish': 'Cranberries',
+                'instructions': [
+                    'Mélanger vodka et jus',
+                    'Servir sur glace',
+                    'Garnir avec cranberries fraîches'
+                ]
+            },
+            {
+                'id': 'rum_cola',
+                'name': 'Rum & Cola',
+                'ingredients': [
+                    {'name': 'Rhum', 'amount_ml': 50, 'category': 'spirits'},
+                    {'name': 'Coca Cola', 'amount_ml': 120, 'category': 'mixers'}
+                ],
+                'description': 'Classique intemporel, Cuba Libre version simple',
                 'category': 'classic',
+                'difficulty': 1,
+                'glass_type': 'highball',
+                'garnish': 'Citron vert',
+                'instructions': [
+                    'Verser le rhum sur glace',
+                    'Ajouter le Coca Cola',
+                    'Mélanger légèrement',
+                    'Garnir avec citron vert'
+                ]
+            },
+            {
+                'id': 'tequila_sunrise',
+                'name': 'Tequila Sunrise',
+                'ingredients': [
+                    {'name': 'Tequila', 'amount_ml': 45, 'category': 'spirits'},
+                    {'name': 'Jus d\'orange', 'amount_ml': 90, 'category': 'juices'},
+                    {'name': 'Grenadine', 'amount_ml': 10, 'category': 'syrups'}
+                ],
+                'description': 'Magnifique dégradé de couleurs, goût tropical',
+                'category': 'tropical',
                 'difficulty': 2,
                 'glass_type': 'highball',
-                'garnish': 'Citron',
+                'garnish': 'Orange et cerise',
                 'instructions': [
-                    'Mélanger gin, jus de citron et sirop',
-                    'Ajouter la glace',
-                    'Compléter avec l\'eau gazeuse',
-                    'Garnir avec le citron'
-                ]
-            },
-            {
-                'id': 'sidecar',
-                'name': 'Sidecar', 
-                'ingredients': [
-                    {'name': 'Brandy', 'amount_ml': 50, 'category': 'spirits'},
-                    {'name': 'Triple Sec', 'amount_ml': 20, 'category': 'spirits'},
-                    {'name': 'Jus de citron', 'amount_ml': 15, 'category': 'juices'}
-                ],
-                'description': 'Sophistiqué et équilibré, né dans les bars parisiens',
-                'category': 'classic',
-                'difficulty': 3,
-                'glass_type': 'coupe',
-                'garnish': 'Sucre sur le bord',
-                'instructions': [
-                    'Sucrer le bord du verre',
-                    'Mélanger tous les ingrédients',
-                    'Servir dans le verre givré',
-                    'Garnir élégamment'
-                ]
-            },
-            {
-                'id': 'bee_knees',
-                'name': 'Bee\'s Knees',
-                'ingredients': [
-                    {'name': 'Gin', 'amount_ml': 60, 'category': 'spirits'},
-                    {'name': 'Jus de citron', 'amount_ml': 20, 'category': 'juices'},
-                    {'name': 'Sirop de miel', 'amount_ml': 15, 'category': 'syrups'}
-                ],
-                'description': 'Doux et aromatique, populaire pendant la prohibition',
-                'category': 'classic',
-                'difficulty': 2,
-                'glass_type': 'coupe',
-                'garnish': 'Zeste de citron',
-                'instructions': [
-                    'Mélanger tous les ingrédients',
-                    'Shaker avec de la glace',
-                    'Filtrer dans le verre',
-                    'Garnir avec le zeste'
-                ]
-            },
-            {
-                'id': 'whiskey_sour',
-                'name': 'Whiskey Sour',
-                'ingredients': [
-                    {'name': 'Whisky', 'amount_ml': 60, 'category': 'spirits'},
-                    {'name': 'Jus de citron', 'amount_ml': 25, 'category': 'juices'},
-                    {'name': 'Simple syrup', 'amount_ml': 15, 'category': 'syrups'}
-                ],
-                'description': 'Parfait équilibre entre doux et acide',
-                'category': 'classic',
-                'difficulty': 2,
-                'glass_type': 'rocks',
-                'garnish': 'Cerise et orange',
-                'instructions': [
-                    'Combiner whisky, jus et sirop',
-                    'Shaker vigoureusement',
-                    'Servir sur glace',
+                    'Mélanger tequila et jus d\'orange',
+                    'Ajouter la grenadine lentement',
+                    'Observer le dégradé se former',
                     'Garnir avec fruits'
                 ]
             },
             {
-                'id': 'manhattan',
-                'name': 'Manhattan',
+                'id': 'whisky_cola',
+                'name': 'Whisky Cola',
                 'ingredients': [
-                    {'name': 'Whisky', 'amount_ml': 60, 'category': 'spirits'},
-                    {'name': 'Vermouth rouge', 'amount_ml': 20, 'category': 'spirits'},
-                    {'name': 'Bitters', 'amount_ml': 2, 'category': 'syrups'}
+                    {'name': 'Whisky', 'amount_ml': 50, 'category': 'spirits'},
+                    {'name': 'Coca Cola', 'amount_ml': 120, 'category': 'mixers'}
                 ],
-                'description': 'Cocktail sophistiqué de Manhattan, pur et puissant',
+                'description': 'Jack & Coke version élégante, goût authentique',
                 'category': 'classic',
-                'difficulty': 3,
-                'glass_type': 'coupe',
-                'garnish': 'Cerise',
+                'difficulty': 1,
+                'glass_type': 'rocks',
+                'garnish': 'Citron',
                 'instructions': [
-                    'Mélanger délicatement les ingrédients',
-                    'Refroidir sans diluer',
-                    'Servir dans verre glacé',
-                    'Garnir avec cerise de qualité'
+                    'Verser le whisky sur glace',
+                    'Compléter avec Coca Cola',
+                    'Remuer délicatement',
+                    'Garnir avec citron'
+                ]
+            },
+            {
+                'id': 'brandy_orange',
+                'name': 'Brandy Orange',
+                'ingredients': [
+                    {'name': 'Brandy', 'amount_ml': 60, 'category': 'spirits'},
+                    {'name': 'Jus d\'orange', 'amount_ml': 80, 'category': 'juices'},
+                    {'name': 'Triple Sec', 'amount_ml': 10, 'category': 'spirits'}
+                ],
+                'description': 'Sophistiqué et fruité, notes d\'agrumes prononcées',
+                'category': 'classic',
+                'difficulty': 2,
+                'glass_type': 'coupe',
+                'garnish': 'Zeste d\'orange',
+                'instructions': [
+                    'Mélanger brandy et Triple Sec',
+                    'Ajouter le jus d\'orange',
+                    'Servir dans verre refroidi',
+                    'Garnir avec zeste d\'orange'
                 ]
             }
         ]

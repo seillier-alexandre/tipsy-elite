@@ -67,6 +67,11 @@ class Fonts:
     """Gestionnaire des polices Art Déco"""
     
     def __init__(self):
+        # Initialiser pygame et le module font
+        if not pygame.get_init():
+            pygame.init()
+        if not pygame.font.get_init():
+            pygame.font.init()
         self.fonts = {}
         self._load_fonts()
     

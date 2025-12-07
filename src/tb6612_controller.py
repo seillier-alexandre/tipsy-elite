@@ -15,12 +15,20 @@ try:
     import RPi.GPIO as GPIO
 except ImportError:
     # Mode simulation si RPi.GPIO n'est pas disponible
+    class MockPWM:
+        def __init__(self, pin, freq):
+            self.pin = pin
+            self.freq = freq
+        def start(self, duty): pass
+        def stop(self): pass
+        def ChangeDutyCycle(self, duty): pass
+    
     class MockGPIO:
         BCM = "BCM"
         OUT = "OUT"
         LOW = 0
         HIGH = 1
-        PWM = None
+        PWM = MockPWM
         
         @staticmethod
         def setmode(mode): pass
@@ -34,6 +42,8 @@ except ImportError:
         def cleanup(): pass
     
     GPIO = MockGPIO()
+    import logging
+    logger = logging.getLogger(__name__)
     logger.warning("RPi.GPIO non disponible - Mode simulation activé")
 
 from hardware_config import (

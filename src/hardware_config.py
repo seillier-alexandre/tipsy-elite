@@ -28,10 +28,10 @@ class TB6612FNGConfig:
         if len(set(all_pins)) != len(all_pins):
             raise ValueError("Pins GPIO dupliquées détectées")
         
-        # Vérifier que les pins sont dans la plage valide
+        # Vérifier que les pins sont dans la plage valide (0-27 GPIO natif, 100+ expandeur)
         for pin in all_pins:
-            if not (0 <= pin <= 27):
-                raise ValueError(f"Pin GPIO {pin} hors de la plage valide (0-27)")
+            if not ((0 <= pin <= 27) or (pin >= 100)):
+                raise ValueError(f"Pin GPIO {pin} hors de la plage valide (0-27 ou 100+)")
 
 @dataclass
 class PumpConfig:
@@ -49,42 +49,43 @@ class PumpConfig:
         """Débit effectif avec calibrage"""
         return self.flow_rate_ml_per_second * self.calibration_factor
 
-# Configuration des contrôleurs TB6612FNG
-# Utilisation optimale des GPIO du Raspberry Pi
+# Configuration optimisée TB6612FNG (6 contrôleurs pour 12 pompes)
+# STBY commun pour tous + PWM partagés = 26 pins au lieu de 42
+# STBY commun = 1 pin, PWM A/B communs = 2 pins, Direction = 4 pins/contrôleur = 23 pins
 TB6612_CONTROLLERS: List[TB6612FNGConfig] = [
-    # Contrôleur 1 - Pompes 1 & 2
+    # Contrôleur 0 - Pompes 1 & 2
     TB6612FNGConfig(
-        ain1=5, ain2=6, bin1=13, bin2=19,
-        pwma=12, pwmb=16, stby=26
+        ain1=2, ain2=3, bin1=4, bin2=17,
+        pwma=12, pwmb=13, stby=26  # STBY commun à tous
     ),
-    # Contrôleur 2 - Pompes 3 & 4  
+    # Contrôleur 1 - Pompes 3 & 4
     TB6612FNGConfig(
-        ain1=20, ain2=21, bin1=22, bin2=23,
-        pwma=24, pwmb=25, stby=7
+        ain1=27, ain2=22, bin1=10, bin2=9,
+        pwma=12, pwmb=13, stby=26  # PWM et STBY partagés
     ),
-    # Contrôleur 3 - Pompes 5 & 6
+    # Contrôleur 2 - Pompes 5 & 6
     TB6612FNGConfig(
-        ain1=8, ain2=9, bin1=10, bin2=11,
-        pwma=17, pwmb=27, stby=4
+        ain1=11, ain2=5, bin1=6, bin2=19,
+        pwma=12, pwmb=13, stby=26  # PWM et STBY partagés
     ),
-    # Contrôleur 4 - Pompes 7 & 8
+    # Contrôleur 3 - Pompes 7 & 8
     TB6612FNGConfig(
-        ain1=2, ain2=3, bin1=14, bin2=15,
-        pwma=18, pwmb=25, stby=1
+        ain1=16, ain2=20, bin1=21, bin2=1,
+        pwma=12, pwmb=13, stby=26  # PWM et STBY partagés
     ),
-    # Contrôleur 5 - Pompes 9 & 10
+    # Contrôleur 4 - Pompes 9 & 10
     TB6612FNGConfig(
-        ain1=0, ain2=1, bin1=7, bin2=8,
-        pwma=12, pwmb=16, stby=20
+        ain1=7, ain2=8, bin1=25, bin2=24,
+        pwma=12, pwmb=13, stby=26  # PWM et STBY partagés
     ),
-    # Contrôleur 6 - Pompes 11 & 12 + Pompe de nettoyage
+    # Contrôleur 5 - Pompes 11 & 12
     TB6612FNGConfig(
-        ain1=21, ain2=26, bin1=19, bin2=13,
-        pwma=6, pwmb=5, stby=11
+        ain1=23, ain2=18, bin1=15, bin2=14,
+        pwma=12, pwmb=13, stby=26  # PWM et STBY partagés
     ),
 ]
 
-# Configuration des pompes
+# Configuration des 12 pompes (6 contrôleurs TB6612)
 PUMP_CONFIGS: List[PumpConfig] = [
     # Spiritueux de base
     PumpConfig(1, 0, 'A', 'Vodka', 2.8, 1.0, 750),
@@ -105,8 +106,8 @@ PUMP_CONFIGS: List[PumpConfig] = [
     PumpConfig(12, 5, 'B', 'Grenadine', 2.0, 1.0, 500),
 ]
 
-# Pompe de nettoyage (utilise le canal libre du contrôleur 6)
-CLEANING_PUMP_CONFIG = PumpConfig(99, 5, 'B', 'Solution de nettoyage', 4.0, 1.0, 2000)
+# Pompe de nettoyage dédiée (pompe 12 fait double usage si besoin)
+CLEANING_PUMP_CONFIG = PumpConfig(12, 5, 'B', 'Grenadine/Nettoyage', 2.0, 1.0, 500)
 
 # Configuration de l'écran tactile rond
 SCREEN_CONFIG = {
@@ -120,15 +121,10 @@ SCREEN_CONFIG = {
     'rotation': 0,  # Rotation en degrés si nécessaire
 }
 
-# Pins des capteurs et accessoires
+# Pins des capteurs (configuration minimale)
 SENSOR_PINS = {
-    'level_sensors': [40, 41, 42, 43, 44, 45],  # Capteurs niveau réservoirs
-    'flow_sensor': 46,                           # Capteur débit global
-    'emergency_stop': 47,                        # Bouton arrêt d'urgence
-    'door_sensor': 48,                          # Capteur ouverture porte
-    'status_led_r': 49,                         # LED status rouge
-    'status_led_g': 50,                         # LED status verte  
-    'status_led_b': 51,                         # LED status bleue
+    # Aucun capteur externe requis pour le fonctionnement de base
+    # Les pins GPIO sont entièrement dédiés aux contrôleurs de pompes
 }
 
 # Temporisations et paramètres de fonctionnement
@@ -157,19 +153,23 @@ class HardwareValidator:
     def validate_gpio_configuration() -> bool:
         """Valide que tous les pins GPIO sont correctement configurés"""
         used_pins = set()
+        shared_pins = set()  # PWM et STBY partagés autorisés
         
         # Vérifier les contrôleurs TB6612FNG
         for i, controller in enumerate(TB6612_CONTROLLERS):
-            controller_pins = [
-                controller.ain1, controller.ain2, controller.bin1, controller.bin2,
-                controller.pwma, controller.pwmb, controller.stby
-            ]
+            # Pins de direction (doivent être uniques)
+            direction_pins = [controller.ain1, controller.ain2, controller.bin1, controller.bin2]
+            # Pins partagés (PWM et STBY peuvent être communs)
+            shared_pins.update([controller.pwma, controller.pwmb, controller.stby])
             
-            for pin in controller_pins:
+            for pin in direction_pins:
                 if pin in used_pins:
-                    logger.error(f"Pin GPIO {pin} utilisé plusieurs fois (contrôleur {i})")
+                    logger.error(f"Pin GPIO direction {pin} utilisé plusieurs fois (contrôleur {i})")
                     return False
                 used_pins.add(pin)
+        
+        # Ajouter les pins partagés
+        used_pins.update(shared_pins)
         
         # Vérifier les capteurs
         for sensor, pin in SENSOR_PINS.items():
