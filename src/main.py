@@ -103,11 +103,15 @@ class TipsySystem:
         
         # 5. Initialisation de l'interface
         logger.info("[INIT] Initialisation interface utilisateur...")
-        self.interface = ArtDecoInterface()
-        if not self.interface.initialize():
-            logger.error("[ERROR] Échec initialisation interface")
+        try:
+            self.interface = ArtDecoInterface()
+            if not self.interface.initialize():
+                logger.error("[ERROR] Échec initialisation interface")
+                return False
+            logger.info("[OK] Interface utilisateur initialisée")
+        except Exception as e:
+            logger.error(f"[ERROR] Erreur initialisation interface: {e}")
             return False
-        logger.info("[OK] Interface utilisateur initialisée")
         
         logger.info("[READY] Tous les systèmes sont opérationnels")
         return True
