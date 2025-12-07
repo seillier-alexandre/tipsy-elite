@@ -21,6 +21,99 @@ logger = logging.getLogger(__name__)
 # pygame.init() - Déplacé dans la méthode initialize()
 # pygame.mixer.init() - Déplacé dans la méthode initialize()
 
+@dataclass
+class GestureEvent:
+    """Événement de geste tactile"""
+    gesture_type: str  # 'swipe_left', 'swipe_right', 'swipe_up', 'swipe_down'
+    start_pos: Tuple[int, int]
+    end_pos: Tuple[int, int]
+    distance: float
+    velocity: float
+    timestamp: float
+
+class GestureManager:
+    """Gestionnaire des gestes tactiles pour interface moderne"""
+    
+    def __init__(self, min_distance: int = 50, min_velocity: float = 200):
+        self.min_distance = min_distance
+        self.min_velocity = min_velocity
+        self.touch_start = None
+        self.touch_start_time = None
+        self.callbacks = {
+            'swipe_left': [],
+            'swipe_right': [], 
+            'swipe_up': [],
+            'swipe_down': []
+        }
+    
+    def register_callback(self, gesture_type: str, callback: Callable):
+        """Enregistre un callback pour un geste"""
+        if gesture_type in self.callbacks:
+            self.callbacks[gesture_type].append(callback)
+    
+    def handle_event(self, event) -> Optional[GestureEvent]:
+        """Traite les événements tactiles/souris"""
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.touch_start = pygame.mouse.get_pos()
+            self.touch_start_time = time.time()
+            return None
+        
+        elif event.type == pygame.MOUSEBUTTONUP and self.touch_start:
+            touch_end = pygame.mouse.get_pos()
+            touch_end_time = time.time()
+            
+            # Calculer distance et vélocité
+            dx = touch_end[0] - self.touch_start[0]
+            dy = touch_end[1] - self.touch_start[1]
+            distance = math.sqrt(dx*dx + dy*dy)
+            duration = max(touch_end_time - self.touch_start_time, 0.001)
+            velocity = distance / duration
+            
+            # Vérifier si c'est un geste valide
+            if distance >= self.min_distance and velocity >= self.min_velocity:
+                gesture_event = self._detect_gesture(dx, dy, distance, velocity)
+                if gesture_event:
+                    self._trigger_callbacks(gesture_event)
+                    return gesture_event
+            
+            self.touch_start = None
+            self.touch_start_time = None
+            return None
+    
+    def _detect_gesture(self, dx: float, dy: float, distance: float, velocity: float) -> Optional[GestureEvent]:
+        """Détecte le type de geste"""
+        abs_dx = abs(dx)
+        abs_dy = abs(dy)
+        
+        # Déterminer direction principale
+        if abs_dx > abs_dy:  # Geste horizontal
+            if dx > 0:
+                gesture_type = 'swipe_right'
+            else:
+                gesture_type = 'swipe_left'
+        else:  # Geste vertical
+            if dy > 0:
+                gesture_type = 'swipe_down'
+            else:
+                gesture_type = 'swipe_up'
+        
+        return GestureEvent(
+            gesture_type=gesture_type,
+            start_pos=self.touch_start,
+            end_pos=(self.touch_start[0] + dx, self.touch_start[1] + dy),
+            distance=distance,
+            velocity=velocity,
+            timestamp=time.time()
+        )
+    
+    def _trigger_callbacks(self, gesture_event: GestureEvent):
+        """Déclenche les callbacks pour un geste"""
+        for callback in self.callbacks[gesture_event.gesture_type]:
+            try:
+                callback(gesture_event)
+            except Exception as e:
+                logger.error(f"Erreur callback geste {gesture_event.gesture_type}: {e}")
+
 # Configuration écran rond
 SCREEN_WIDTH = SCREEN_CONFIG['width']
 SCREEN_HEIGHT = SCREEN_CONFIG['height'] 
@@ -607,6 +700,358 @@ class CocktailCard(ArtDecoElement):
         if abs(self.scale - self.target_scale) > 0.001:
             self.scale += (self.target_scale - self.scale) * 0.1
 
+class CocktailCarousel:
+    """Carrousel de cocktails avec navigation tactile horizontale"""
+    
+    def __init__(self, cocktails: List[Dict], fonts: 'Fonts'):
+        self.cocktails = cocktails
+        self.fonts = fonts
+        self.current_index = 0
+        self.scroll_offset = 0.0
+        self.target_offset = 0.0
+        self.is_animating = False
+        self.card_width = 500
+        self.card_height = 600
+        
+    def next_cocktail(self):
+        """Passe au cocktail suivant"""
+        if self.current_index < len(self.cocktails) - 1:
+            self.current_index += 1
+            self.target_offset = -self.current_index * self.card_width
+            self.is_animating = True
+    
+    def previous_cocktail(self):
+        """Passe au cocktail précédent"""
+        if self.current_index > 0:
+            self.current_index -= 1
+            self.target_offset = -self.current_index * self.card_width
+            self.is_animating = True
+    
+    def update(self):
+        """Met à jour les animations"""
+        if self.is_animating:
+            diff = self.target_offset - self.scroll_offset
+            self.scroll_offset += diff * 0.15
+            if abs(diff) < 1:
+                self.scroll_offset = self.target_offset
+                self.is_animating = False
+    
+    def draw(self, screen):
+        """Dessine le carrousel"""
+        self.update()
+        
+        # Position centrale pour l'affichage
+        center_x = CENTER_X
+        center_y = CENTER_Y - 50
+        
+        for i, cocktail in enumerate(self.cocktails):
+            # Position de la carte
+            card_x = center_x - self.card_width // 2 + i * self.card_width + self.scroll_offset
+            card_y = center_y - self.card_height // 2
+            
+            # Ne dessiner que les cartes visibles
+            if -self.card_width <= card_x <= SCREEN_WIDTH:
+                self._draw_cocktail_card(screen, cocktail, card_x, card_y, i == self.current_index)
+    
+    def _draw_cocktail_card(self, screen, cocktail, x, y, is_active):
+        """Dessine une carte cocktail"""
+        # Échelle pour carte active
+        scale = 1.0 if is_active else 0.85
+        alpha = 255 if is_active else 180
+        
+        # Surface de la carte avec alpha
+        card_surface = pygame.Surface((self.card_width * scale, self.card_height * scale), pygame.SRCALPHA)
+        
+        # Fond avec dégradé Art Déco
+        self._draw_art_deco_background(card_surface, scale, is_active)
+        
+        # Image du cocktail (placeholder pour l'instant)
+        self._draw_cocktail_image(card_surface, cocktail, scale)
+        
+        # Nom du cocktail
+        self._draw_cocktail_info(card_surface, cocktail, scale, is_active)
+        
+        # Appliquer alpha et dessiner
+        card_surface.set_alpha(alpha)
+        final_x = x + (self.card_width - self.card_width * scale) // 2
+        final_y = y + (self.card_height - self.card_height * scale) // 2
+        screen.blit(card_surface, (final_x, final_y))
+    
+    def _draw_art_deco_background(self, surface, scale, is_active):
+        """Dessine le fond Art Déco de la carte"""
+        width = int(self.card_width * scale)
+        height = int(self.card_height * scale)
+        
+        # Fond principal
+        color = Colors.CHARCOAL if is_active else Colors.DEEP_BLACK
+        pygame.draw.rect(surface, color, (0, 0, width, height), border_radius=15)
+        
+        # Bordure dorée
+        border_color = Colors.GOLD if is_active else Colors.DARK_GOLD
+        pygame.draw.rect(surface, border_color, (0, 0, width, height), width=3, border_radius=15)
+        
+        # Motifs Art Déco
+        if is_active:
+            # Lignes décoratives en haut
+            for i in range(3):
+                y_pos = 20 + i * 8
+                line_width = width - 40 - i * 20
+                line_x = (width - line_width) // 2
+                pygame.draw.rect(surface, Colors.DARK_GOLD, (line_x, y_pos, line_width, 2))
+    
+    def _draw_cocktail_image(self, surface, cocktail, scale):
+        """Dessine l'image du cocktail"""
+        # Zone image
+        img_width = int(300 * scale)
+        img_height = int(300 * scale)
+        img_x = (int(self.card_width * scale) - img_width) // 2
+        img_y = int(80 * scale)
+        
+        # Fond image temporaire (remplacer par vraie image)
+        img_color = self._get_cocktail_color(cocktail)
+        pygame.draw.ellipse(surface, img_color, (img_x, img_y, img_width, img_height))
+        pygame.draw.ellipse(surface, Colors.GOLD, (img_x, img_y, img_width, img_height), width=2)
+        
+        # Reflet style verre
+        highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
+        highlight.fill((*Colors.CREAM, 60))
+        surface.blit(highlight, (img_x + img_width//4, img_y + img_height//6))
+    
+    def _draw_cocktail_info(self, surface, cocktail, scale, is_active):
+        """Dessine les informations du cocktail"""
+        width = int(self.card_width * scale)
+        
+        # Nom du cocktail
+        font_size = 'title' if is_active else 'subtitle'
+        font = self.fonts.get(font_size)
+        name_surface = font.render(cocktail['name'], True, Colors.GOLD)
+        name_rect = name_surface.get_rect(center=(width//2, int(420 * scale)))
+        surface.blit(name_surface, name_rect)
+        
+        # Description courte
+        if is_active and 'description' in cocktail:
+            desc_font = self.fonts.get('small')
+            desc_lines = self._wrap_text(cocktail['description'], desc_font, width - 40)
+            y_offset = int(460 * scale)
+            
+            for line in desc_lines[:2]:  # Max 2 lignes
+                line_surface = desc_font.render(line, True, Colors.CREAM)
+                line_rect = line_surface.get_rect(center=(width//2, y_offset))
+                surface.blit(line_surface, line_rect)
+                y_offset += 25
+    
+    def _get_cocktail_color(self, cocktail):
+        """Retourne une couleur représentative du cocktail"""
+        colors = {
+            'gin': Colors.EMERALD,
+            'vodka': Colors.PLATINUM,
+            'whisky': Colors.WHISKEY_AMBER,
+            'rhum': Colors.BRONZE,
+            'tequila': Colors.GOLD,
+            'brandy': Colors.BURGUNDY
+        }
+        
+        # Recherche par ingrédient principal
+        for ingredient in cocktail.get('ingredients', []):
+            for spirit, color in colors.items():
+                if spirit.lower() in ingredient['name'].lower():
+                    return color
+        
+        return Colors.SILVER
+    
+    def _wrap_text(self, text, font, max_width):
+        """Découpe le texte en lignes"""
+        words = text.split()
+        lines = []
+        current_line = []
+        
+        for word in words:
+            test_line = ' '.join(current_line + [word])
+            if font.size(test_line)[0] <= max_width:
+                current_line.append(word)
+            else:
+                if current_line:
+                    lines.append(' '.join(current_line))
+                current_line = [word]
+        
+        if current_line:
+            lines.append(' '.join(current_line))
+        
+        return lines
+    
+    def get_current_cocktail(self):
+        """Retourne le cocktail actuellement sélectionné"""
+        return self.cocktails[self.current_index] if self.cocktails else None
+
+class IngredientPanel:
+    """Panel des ingrédients avec statut pompes (swipe up)"""
+    
+    def __init__(self, fonts: 'Fonts'):
+        self.fonts = fonts
+        self.visible = False
+        self.slide_offset = SCREEN_HEIGHT
+        self.target_offset = SCREEN_HEIGHT
+        self.cocktail = None
+        
+    def show(self, cocktail):
+        """Affiche le panel avec un cocktail"""
+        self.cocktail = cocktail
+        self.visible = True
+        self.target_offset = 100  # Laisse un peu d'espace en haut
+        
+    def hide(self):
+        """Cache le panel"""
+        self.visible = False
+        self.target_offset = SCREEN_HEIGHT
+        
+    def update(self):
+        """Met à jour l'animation"""
+        diff = self.target_offset - self.slide_offset
+        self.slide_offset += diff * 0.2
+        
+        if not self.visible and abs(diff) < 5:
+            self.slide_offset = SCREEN_HEIGHT
+            
+    def draw(self, screen):
+        """Dessine le panel"""
+        if self.slide_offset >= SCREEN_HEIGHT - 10:
+            return
+            
+        self.update()
+        
+        # Surface du panel
+        panel_height = SCREEN_HEIGHT - self.slide_offset
+        panel_surface = pygame.Surface((SCREEN_WIDTH, panel_height), pygame.SRCALPHA)
+        
+        # Fond Art Déco
+        panel_surface.fill(Colors.CHARCOAL)
+        pygame.draw.rect(panel_surface, Colors.GOLD, (0, 0, SCREEN_WIDTH, panel_height), width=3)
+        
+        # Titre
+        title_font = self.fonts.get('subtitle')
+        title = "INGRÉDIENTS"
+        title_surface = title_font.render(title, True, Colors.GOLD)
+        title_rect = title_surface.get_rect(center=(SCREEN_WIDTH//2, 50))
+        panel_surface.blit(title_surface, title_rect)
+        
+        # Liste des ingrédients
+        if self.cocktail:
+            self._draw_ingredients_list(panel_surface)
+        
+        # Dessiner sur l'écran principal
+        screen.blit(panel_surface, (0, self.slide_offset))
+    
+    def _draw_ingredients_list(self, surface):
+        """Dessine la liste des ingrédients avec statut"""
+        y_start = 100
+        ingredient_height = 60
+        
+        for i, ingredient in enumerate(self.cocktail.get('ingredients', [])):
+            y_pos = y_start + i * ingredient_height
+            if y_pos > surface.get_height() - 50:
+                break
+                
+            self._draw_ingredient_item(surface, ingredient, y_pos)
+    
+    def _draw_ingredient_item(self, surface, ingredient, y_pos):
+        """Dessine un item ingrédient"""
+        # Nom de l'ingrédient
+        font = self.fonts.get('medium')
+        name = ingredient['name']
+        amount = f"{ingredient['amount_ml']}ml"
+        
+        name_surface = font.render(name, True, Colors.CREAM)
+        surface.blit(name_surface, (50, y_pos))
+        
+        amount_surface = font.render(amount, True, Colors.GOLD)
+        amount_rect = amount_surface.get_rect(right=SCREEN_WIDTH - 150, y=y_pos)
+        surface.blit(amount_surface, amount_rect)
+        
+        # Indicateur statut (simulé pour l'instant)
+        status_color = Colors.SUCCESS_GREEN if ingredient.get('is_available', True) else Colors.ERROR_RED
+        pygame.draw.circle(surface, status_color, (SCREEN_WIDTH - 80, y_pos + 15), 12)
+
+class SettingsPanel:
+    """Panel des settings (swipe down)"""
+    
+    def __init__(self, fonts: 'Fonts'):
+        self.fonts = fonts
+        self.visible = False
+        self.slide_offset = -SCREEN_HEIGHT
+        self.target_offset = -SCREEN_HEIGHT
+        
+    def show(self):
+        """Affiche le panel"""
+        self.visible = True
+        self.target_offset = -100  # Laisse un peu d'espace en bas
+        
+    def hide(self):
+        """Cache le panel"""
+        self.visible = False
+        self.target_offset = -SCREEN_HEIGHT
+        
+    def update(self):
+        """Met à jour l'animation"""
+        diff = self.target_offset - self.slide_offset
+        self.slide_offset += diff * 0.2
+        
+    def draw(self, screen):
+        """Dessine le panel"""
+        if self.slide_offset <= -SCREEN_HEIGHT + 10:
+            return
+            
+        self.update()
+        
+        # Surface du panel
+        panel_height = SCREEN_HEIGHT + self.slide_offset
+        panel_surface = pygame.Surface((SCREEN_WIDTH, panel_height), pygame.SRCALPHA)
+        
+        # Fond Art Déco
+        panel_surface.fill(Colors.CHARCOAL)
+        pygame.draw.rect(panel_surface, Colors.GOLD, (0, 0, SCREEN_WIDTH, panel_height), width=3)
+        
+        # Titre
+        title_font = self.fonts.get('subtitle')
+        title = "PARAMÈTRES"
+        title_surface = title_font.render(title, True, Colors.GOLD)
+        title_rect = title_surface.get_rect(center=(SCREEN_WIDTH//2, 50))
+        panel_surface.blit(title_surface, title_rect)
+        
+        # Options de settings
+        self._draw_settings_options(panel_surface)
+        
+        # Dessiner sur l'écran principal
+        screen.blit(panel_surface, (0, self.slide_offset))
+    
+    def _draw_settings_options(self, surface):
+        """Dessine les options de settings"""
+        options = [
+            "Calibrage Pompes",
+            "Nettoyage Système", 
+            "Historique Cocktails",
+            "Niveau Bouteilles",
+            "Configuration"
+        ]
+        
+        y_start = 120
+        option_height = 70
+        
+        for i, option in enumerate(options):
+            y_pos = y_start + i * option_height
+            if y_pos > surface.get_height() - 50:
+                break
+                
+            # Fond option
+            option_rect = pygame.Rect(30, y_pos - 10, SCREEN_WIDTH - 60, option_height - 20)
+            pygame.draw.rect(surface, Colors.DEEP_BLACK, option_rect, border_radius=10)
+            pygame.draw.rect(surface, Colors.DARK_GOLD, option_rect, width=2, border_radius=10)
+            
+            # Texte option
+            font = self.fonts.get('medium')
+            text_surface = font.render(option, True, Colors.CREAM)
+            text_rect = text_surface.get_rect(center=option_rect.center)
+            surface.blit(text_surface, text_rect)
+
 class ArtDecoInterface:
     """Interface principale Art Déco pour machine à cocktails"""
     
@@ -627,6 +1072,17 @@ class ArtDecoInterface:
         # Éléments UI
         self.elements: List[ArtDecoElement] = []
         self.buttons: List[ArtDecoButton] = []
+        
+        # Nouveaux composants tactiles
+        self.gesture_manager = GestureManager()
+        self.cocktail_carousel = None
+        self.ingredient_panel = IngredientPanel(self.fonts)
+        self.settings_panel = SettingsPanel(self.fonts)
+        self.serve_button = None
+        
+        # État des panels
+        self.ingredient_panel_visible = False
+        self.settings_panel_visible = False
         
         # Données
         self.cocktails = []
@@ -665,43 +1121,64 @@ class ArtDecoInterface:
         # Créer les éléments UI
         self.create_ui_elements()
         
+        # Initialiser le cocktail sélectionné
+        if self.cocktails:
+            self.selected_cocktail = self.cocktails[0]
+            logger.info(f"Cocktail initial sélectionné: {self.selected_cocktail.get('name', 'Inconnu')}")
+        
         # Démarrer le thread d'animation
         self.start_animation_thread()
         
         return True
     
     def load_cocktails(self):
-        """Charge les cocktails depuis la configuration"""
-        # Pour l'instant, cocktails d'exemple
-        self.cocktails = [
-            {
-                "name": "Old Fashioned",
-                "ingredients": [
-                    {"name": "Whisky", "amount": "60ml"},
-                    {"name": "Sirop simple", "amount": "10ml"},
-                    {"name": "Bitters", "amount": "2 traits"}
-                ],
-                "description": "Cocktail classique de l'ère prohibition"
-            },
-            {
-                "name": "Gin Fizz",
-                "ingredients": [
-                    {"name": "Gin", "amount": "45ml"},
-                    {"name": "Jus de citron", "amount": "20ml"},
-                    {"name": "Eau gazeuse", "amount": "Top"}
-                ],
-                "description": "Rafraîchissant et élégant"
-            },
-            {
-                "name": "Sidecar",
-                "ingredients": [
-                    {"name": "Brandy", "amount": "50ml"},
-                    {"name": "Triple Sec", "amount": "20ml"},
-                    {"name": "Jus de citron", "amount": "15ml"}
-                ],
-                "description": "Sophistiqué et équilibré"
-            }
-        ]
+        """Charge les cocktails depuis le gestionnaire de cocktails"""
+        try:
+            # Importer le gestionnaire de cocktails
+            from cocktail_manager import get_cocktail_manager
+            cocktail_manager = get_cocktail_manager()
+            
+            # Charger les cocktails réalisables
+            recipes = cocktail_manager.database.get_makeable_cocktails()
+            
+            self.cocktails = []
+            for recipe in recipes:
+                cocktail_data = {
+                    "id": recipe.id,
+                    "name": recipe.name,
+                    "description": recipe.description,
+                    "ingredients": [
+                        {
+                            "name": ing.name,
+                            "amount": f"{ing.amount_ml}ml",
+                            "available": ing.is_available
+                        } for ing in recipe.ingredients
+                    ],
+                    "category": recipe.category,
+                    "glass_type": recipe.glass_type,
+                    "garnish": recipe.garnish,
+                    "is_makeable": recipe.is_makeable
+                }
+                self.cocktails.append(cocktail_data)
+                
+            logger.info(f"Chargé {len(self.cocktails)} cocktails réalisables")
+            
+        except Exception as e:
+            logger.error(f"Erreur chargement cocktails: {e}")
+            # Fallback vers des cocktails d'exemple
+            self.cocktails = [
+                {
+                    "id": "gin_tonic",
+                    "name": "Gin Tonic",
+                    "ingredients": [
+                        {"name": "Gin", "amount": "50ml", "available": True},
+                        {"name": "Sprite", "amount": "100ml", "available": True}
+                    ],
+                    "description": "Classique rafraîchissant, simple et élégant",
+                    "category": "classic",
+                    "is_makeable": True
+                }
+            ]
     
     def create_ui_elements(self):
         """Crée les éléments de l'interface"""
@@ -733,6 +1210,22 @@ class ArtDecoInterface:
                 lambda: self.switch_screen("settings")
             )
         ]
+        
+        # Créer le carrousel avec les cocktails chargés
+        if self.cocktails:
+            self.cocktail_carousel = CocktailCarousel(self.cocktails, self.fonts)
+        
+        # Créer le bouton servir
+        self.serve_button = ArtDecoButton(
+            CENTER_X - 100, 
+            SCREEN_HEIGHT - 150,
+            200, 60,
+            "SERVIR",
+            self.serve_cocktail
+        )
+        
+        # Enregistrer les callbacks de gestes
+        self.register_gesture_callbacks()
     
     def draw_splash_screen(self):
         """Dessine l'écran de démarrage"""
@@ -888,6 +1381,111 @@ class ArtDecoInterface:
         self.last_interaction = time.time()
         logger.info(f"Basculement vers écran: {new_screen}")
     
+    def register_gesture_callbacks(self):
+        """Enregistre les callbacks pour les gestes tactiles"""
+        # Gestes horizontaux pour navigation cocktails
+        self.gesture_manager.register_callback('swipe_left', self.next_cocktail)
+        self.gesture_manager.register_callback('swipe_right', self.previous_cocktail)
+        
+        # Geste vers le haut pour afficher les ingrédients
+        self.gesture_manager.register_callback('swipe_up', self.show_ingredient_panel)
+        
+        # Geste vers le bas pour afficher les paramètres
+        self.gesture_manager.register_callback('swipe_down', self.show_settings_panel)
+    
+    def next_cocktail(self, gesture_event=None):
+        """Passe au cocktail suivant"""
+        if self.cocktail_carousel and self.current_screen == "cocktail_menu":
+            self.cocktail_carousel.next_cocktail()
+            self.update_selected_cocktail()
+    
+    def previous_cocktail(self, gesture_event=None):
+        """Passe au cocktail précédent"""
+        if self.cocktail_carousel and self.current_screen == "cocktail_menu":
+            self.cocktail_carousel.previous_cocktail()
+            self.update_selected_cocktail()
+    
+    def show_ingredient_panel(self, gesture_event=None):
+        """Affiche le panel des ingrédients"""
+        if self.current_screen == "cocktail_menu" and not self.ingredient_panel_visible:
+            # Mettre à jour les ingrédients du cocktail sélectionné
+            if self.selected_cocktail:
+                self.ingredient_panel.set_ingredients(self.selected_cocktail.get('ingredients', []))
+            
+            self.ingredient_panel_visible = True
+            self.ingredient_panel.show()
+            logger.info("Panel ingrédients affiché")
+    
+    def show_settings_panel(self, gesture_event=None):
+        """Affiche le panel des paramètres"""
+        if self.current_screen == "cocktail_menu" and not self.settings_panel_visible:
+            self.settings_panel_visible = True
+            self.settings_panel.show()
+            logger.info("Panel paramètres affiché")
+    
+    def hide_panels(self):
+        """Masque tous les panels ouverts"""
+        if self.ingredient_panel_visible:
+            self.ingredient_panel.hide()
+            self.ingredient_panel_visible = False
+        
+        if self.settings_panel_visible:
+            self.settings_panel.hide()
+            self.settings_panel_visible = False
+    
+    def update_selected_cocktail(self):
+        """Met à jour le cocktail sélectionné"""
+        if self.cocktail_carousel and self.cocktails:
+            index = self.cocktail_carousel.selected_index
+            if 0 <= index < len(self.cocktails):
+                self.selected_cocktail = self.cocktails[index]
+                logger.info(f"Cocktail sélectionné: {self.selected_cocktail.get('name', 'Inconnu')}")
+    
+    def serve_cocktail(self):
+        """Lance la préparation du cocktail sélectionné"""
+        if not self.selected_cocktail:
+            logger.warning("Aucun cocktail sélectionné")
+            return
+        
+        if not self.selected_cocktail.get('is_makeable', False):
+            logger.warning(f"Cocktail non réalisable: {self.selected_cocktail.get('name')}")
+            return
+        
+        try:
+            # Importer le gestionnaire de cocktails
+            from cocktail_manager import get_cocktail_manager
+            cocktail_manager = get_cocktail_manager()
+            
+            cocktail_id = self.selected_cocktail.get('id')
+            if cocktail_id:
+                logger.info(f"Démarrage préparation cocktail: {self.selected_cocktail.get('name')}")
+                
+                # Démarrer la préparation en asynchrone
+                import threading
+                import asyncio
+                
+                def prepare_async():
+                    try:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        success = loop.run_until_complete(
+                            cocktail_manager.maker.prepare_cocktail(cocktail_id)
+                        )
+                        loop.close()
+                        
+                        if success:
+                            logger.info("Cocktail préparé avec succès")
+                        else:
+                            logger.error("Échec préparation cocktail")
+                    except Exception as e:
+                        logger.error(f"Erreur préparation: {e}")
+                
+                preparation_thread = threading.Thread(target=prepare_async, daemon=True)
+                preparation_thread.start()
+            
+        except Exception as e:
+            logger.error(f"Erreur service cocktail: {e}")
+
     def handle_events(self):
         """Gère les événements pygame"""
         for event in pygame.event.get():
@@ -903,10 +1501,40 @@ class ArtDecoInterface:
             elif event.type in [pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION]:
                 self.last_interaction = time.time()
                 
-                # Gestión d'événements selon l'écran actuel
+                # Traitement des gestes tactiles
+                gesture_event = self.gesture_manager.handle_event(event)
+                
+                # Vérification des clics pour masquer les panels
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # Si clic en dehors des panels, les masquer
+                    if self.current_screen == "cocktail_menu":
+                        if (self.ingredient_panel_visible or self.settings_panel_visible):
+                            # Vérifier si le clic est en dehors des panels
+                            click_pos = event.pos
+                            panel_clicked = False
+                            
+                            if (self.ingredient_panel_visible and 
+                                self.ingredient_panel.rect.collidepoint(click_pos)):
+                                panel_clicked = True
+                            
+                            if (self.settings_panel_visible and 
+                                self.settings_panel.rect.collidepoint(click_pos)):
+                                panel_clicked = True
+                            
+                            if not panel_clicked:
+                                self.hide_panels()
+                
+                # Gestion d'événements selon l'écran actuel
                 if self.current_screen == "main_menu":
                     for button in self.main_menu_buttons:
                         if button.handle_event(event):
+                            break
+                
+                elif self.current_screen == "cocktail_menu":
+                    # Gestion du bouton servir
+                    if (self.serve_button and self.selected_cocktail and 
+                        self.selected_cocktail.get('is_makeable', False)):
+                        if self.serve_button.handle_event(event):
                             break
                 
                 elif self.current_screen == "splash":
@@ -967,28 +1595,56 @@ class ArtDecoInterface:
         pygame.display.flip()
     
     def draw_cocktail_menu(self):
-        """Dessine le menu des cocktails"""
+        """Dessine le menu des cocktails avec carrousel tactile"""
         self.draw_background()
         self.draw_circular_mask()
         
         # Titre
         title_font = self.fonts.get('title')
         title_surface = title_font.render("COCKTAILS", True, Colors.GOLD)
-        title_rect = title_surface.get_rect(center=(CENTER_X, 100))
+        title_rect = title_surface.get_rect(center=(CENTER_X, 80))
         self.screen.blit(title_surface, title_rect)
         
-        # Liste des cocktails (placeholder)
-        font = self.fonts.get('medium')
-        y_pos = 200
-        for i, cocktail in enumerate(self.cocktails[:5]):
-            text = f"{i+1}. {cocktail['name']}"
-            text_surface = font.render(text, True, Colors.CREAM)
-            text_rect = text_surface.get_rect(center=(CENTER_X, y_pos))
-            self.screen.blit(text_surface, text_rect)
-            y_pos += 50
+        # Carrousel de cocktails
+        if self.cocktail_carousel:
+            self.cocktail_carousel.draw(self.screen)
+            
+            # Mettre à jour le cocktail sélectionné
+            if (self.cocktail_carousel.selected_index != getattr(self, '_last_selected_index', -1)):
+                self.update_selected_cocktail()
+                self._last_selected_index = self.cocktail_carousel.selected_index
         
-        # Bouton retour
-        back_button = ArtDecoButton(50, 50, 120, 40, "RETOUR", 
+        # Instructions gestuelles (petite aide en bas)
+        help_font = self.fonts.get('small')
+        help_texts = [
+            "↔ Glissez horizontalement pour naviguer",
+            "↑ Glissez vers le haut pour voir les ingrédients", 
+            "↓ Glissez vers le bas pour les paramètres"
+        ]
+        
+        help_y = SCREEN_HEIGHT - 120
+        for text in help_texts:
+            help_surface = help_font.render(text, True, Colors.SILVER)
+            help_rect = help_surface.get_rect(center=(CENTER_X, help_y))
+            self.screen.blit(help_surface, help_rect)
+            help_y += 25
+        
+        # Bouton servir si cocktail sélectionné et réalisable
+        if (self.selected_cocktail and 
+            self.selected_cocktail.get('is_makeable', False) and 
+            not self.ingredient_panel_visible and 
+            not self.settings_panel_visible):
+            self.serve_button.draw(self.screen, self.fonts)
+        
+        # Panels par-dessus le reste
+        if self.ingredient_panel_visible:
+            self.ingredient_panel.draw(self.screen)
+        
+        if self.settings_panel_visible:
+            self.settings_panel.draw(self.screen)
+        
+        # Bouton retour en haut à gauche
+        back_button = ArtDecoButton(30, 30, 100, 35, "RETOUR", 
                                    lambda: self.switch_screen("main_menu"))
         back_button.draw(self.screen, self.fonts)
     
