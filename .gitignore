@@ -1,0 +1,196 @@
+# Tipsy Elite - Machine à Cocktails .gitignore
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# =============================================================================
+# Virtual Environments
+# =============================================================================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# =============================================================================
+# Configuration & Secrets
+# =============================================================================
+.env
+.env.local
+.env.production
+*.key
+*.pem
+config/pump_config.json
+config/cocktails.json
+config/settings.json
+config/favorites.json
+config/cleaning_history.json
+
+# =============================================================================
+# Logs & Data
+# =============================================================================
+logs/*.log
+*.log
+*.log.*
+log_*
+logs/hardware.log
+logs/cleaning.log
+logs/errors.log
+
+# =============================================================================
+# Hardware & System Files
+# =============================================================================
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =============================================================================
+# IDE & Editors
+# =============================================================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.spyderproject
+.spyproject
+
+# Claude Code
+.claude/
+.claude.json
+.claude.json.backup
+
+# =============================================================================
+# Testing
+# =============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# =============================================================================
+# Documentation
+# =============================================================================
+docs/_build/
+.readthedocs.yml
+site/
+
+# =============================================================================
+# Hardware Specific
+# =============================================================================
+# Backup files from hardware calibration
+calibration_backup_*
+pump_calibration_*.json
+
+# Hardware test logs
+hardware_test_*.log
+
+# Temporary hardware files
+*.tmp
+*.temp
+temp_*
+
+# =============================================================================
+# Assets (keep structure, ignore large files)
+# =============================================================================
+assets/videos/
+assets/large_images/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Keep image structure but ignore large files
+!assets/logos/.gitkeep
+!assets/images/.gitkeep
+
+# =============================================================================
+# Runtime Files
+# =============================================================================
+*.pid
+*.sock
+celerybeat-schedule
+celerybeat.pid
+
+# =============================================================================
+# Database Files (if any)
+# =============================================================================
+*.db
+*.sqlite
+*.sqlite3
+
+# =============================================================================
+# Monitoring & Metrics
+# =============================================================================
+prometheus_data/
+metrics/
+monitoring/
+
+# =============================================================================
+# Backup Files
+# =============================================================================
+*.bak
+*.backup
+backup_*
+*_backup
+
+# =============================================================================
+# Development Tools
+# =============================================================================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Jupyter Notebooks (if any)
+.ipynb_checkpoints
+
+# =============================================================================
+# System Generated
+# =============================================================================
+*.orig
+*.rej
+*.patch
+
+# Keep important empty directories
+!config/.gitkeep
+!logs/.gitkeep
+!assets/.gitkeep

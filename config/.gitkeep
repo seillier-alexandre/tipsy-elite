@@ -1,0 +1,2 @@
+# Keep config directory in git
+# Actual config files will be generated at runtime
