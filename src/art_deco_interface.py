@@ -913,6 +913,7 @@ class CocktailCarousel:
         img_y = int(80 * scale)
         
         # Charger la vraie image du cocktail
+        cocktail_image = None
         try:
             # Import conditionnel de l'ImageManager
             from image_manager import get_image_manager
@@ -923,37 +924,56 @@ class CocktailCarousel:
                 cocktail_image = image_manager.load_cocktail_image(
                     cocktail_id, 'main', (img_width, img_height)
                 )
+                logger.debug(f"Image chargée pour {cocktail_id}: {cocktail_image is not None}")
                 
-                # Créer un masque circulaire pour l'image
-                mask_surface = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
-                pygame.draw.ellipse(mask_surface, (255, 255, 255, 255), (0, 0, img_width, img_height))
-                
-                # Appliquer le masque à l'image
-                masked_image = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
-                masked_image.blit(cocktail_image, (0, 0))
-                masked_image.blit(mask_surface, (0, 0), special_flags=pygame.BLEND_ALPHA_SDL2)
-                
-                # Dessiner l'image masquée
-                surface.blit(masked_image, (img_x, img_y))
-                
-                # Bordure dorée autour
-                pygame.draw.ellipse(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=3)
-                pygame.draw.ellipse(surface, Colors.BRONZE, (img_x-5, img_y-5, img_width+10, img_height+10), width=1)
-                
-                # Reflet style verre par-dessus
-                highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
-                highlight.fill((*Colors.CREAM, 40))
-                surface.blit(highlight, (img_x + img_width//4, img_y + img_height//6))
-                
-                return  # Image chargée avec succès
+                if cocktail_image is not None:
+                    # Créer un masque circulaire pour l'image
+                    mask_surface = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
+                    pygame.draw.ellipse(mask_surface, (255, 255, 255, 255), (0, 0, img_width, img_height))
+                    
+                    # Appliquer le masque à l'image
+                    masked_image = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
+                    masked_image.blit(cocktail_image, (0, 0))
+                    masked_image.blit(mask_surface, (0, 0), special_flags=pygame.BLEND_ALPHA_SDL2)
+                    
+                    # Dessiner l'image masquée
+                    surface.blit(masked_image, (img_x, img_y))
+                    
+                    # Bordure dorée autour
+                    pygame.draw.ellipse(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=3)
+                    pygame.draw.ellipse(surface, Colors.BRONZE, (img_x-5, img_y-5, img_width+10, img_height+10), width=1)
+                    
+                    # Reflet style verre par-dessus
+                    highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
+                    highlight.fill((*Colors.CREAM, 40))
+                    surface.blit(highlight, (img_x + img_width//4, img_y + img_height//6))
+                    
+                    return  # Image chargée avec succès
         
         except Exception as e:
             logger.debug(f"Erreur chargement image cocktail {cocktail.get('id', 'inconnu')}: {e}")
         
         # Fallback : fond coloré temporaire si image non disponible
+        logger.debug(f"Affichage fallback pour cocktail {cocktail.get('name', 'inconnu')}")
         img_color = self._get_cocktail_color(cocktail)
+        
+        # Fond coloré
         pygame.draw.ellipse(surface, img_color, (img_x, img_y, img_width, img_height))
-        pygame.draw.ellipse(surface, Colors.GOLD, (img_x, img_y, img_width, img_height), width=2)
+        
+        # Bordures décoratives
+        pygame.draw.ellipse(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=3)
+        pygame.draw.ellipse(surface, Colors.BRONZE, (img_x-5, img_y-5, img_width+10, img_height+10), width=1)
+        
+        # Icône cocktail au centre
+        icon_size = int(80 * scale)
+        icon_x = img_x + (img_width - icon_size) // 2
+        icon_y = img_y + (img_height - icon_size) // 2
+        
+        # Dessiner un verre stylisé
+        glass_color = Colors.CREAM
+        pygame.draw.ellipse(surface, glass_color, (icon_x + icon_size//4, icon_y + icon_size//3, icon_size//2, icon_size//3), width=3)
+        pygame.draw.line(surface, glass_color, (icon_x + icon_size//2, icon_y + icon_size//3 + icon_size//3), 
+                        (icon_x + icon_size//2, icon_y + icon_size - 5), width=2)
         
         # Reflet style verre
         highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
@@ -991,16 +1011,32 @@ class CocktailCarousel:
             'whisky': Colors.WHISKEY_AMBER,
             'rhum': Colors.BRONZE,
             'tequila': Colors.GOLD,
-            'brandy': Colors.BURGUNDY
+            'brandy': Colors.BURGUNDY,
+            'campari': Colors.CRIMSON,
+            'vermouth': Colors.BURGUNDY,
+            'amaretto': Colors.DARK_GOLD
         }
         
-        # Recherche par ingrédient principal
-        for ingredient in cocktail.get('ingredients', []):
+        cocktail_name = cocktail.get('name', '').lower()
+        logger.debug(f"Couleur pour cocktail: {cocktail_name}")
+        
+        # Recherche par nom de cocktail d'abord
+        for spirit, color in colors.items():
+            if spirit in cocktail_name:
+                return color
+        
+        # Recherche par ingrédient principal  
+        ingredients = cocktail.get('ingredients', [])
+        logger.debug(f"Ingrédients cocktail: {len(ingredients)}")
+        
+        for ingredient in ingredients:
+            ingredient_name = ingredient.get('name', '') if isinstance(ingredient, dict) else str(ingredient)
             for spirit, color in colors.items():
-                if spirit.lower() in ingredient['name'].lower():
+                if spirit.lower() in ingredient_name.lower():
                     return color
         
-        return Colors.SILVER
+        # Couleur par défaut plus visible
+        return Colors.BURGUNDY
     
     def _wrap_text(self, text, font, max_width):
         """Découpe le texte en lignes"""
