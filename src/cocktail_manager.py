@@ -560,46 +560,52 @@ class CocktailMaker:
                 self._notify_progress("Initialisation", 0)
                 
                 # Vérifier le système de pompes
-                with pump_operation() as pump_sys:
-                    # Préparation des ingrédients dans l'ordre optimal
-                    total_steps = len([ing for ing in cocktail.ingredients if ing.category != "garnish"])
-                    current_step = 0
-                    
-                    # Trier les ingrédients par catégorie pour un ordre optimal
-                    sorted_ingredients = sorted(cocktail.ingredients, 
-                                              key=lambda x: self._get_pour_order(x.category))
-                    
-                    for ingredient in sorted_ingredients:
-                        if ingredient.category == "garnish":
-                            continue
-                        
-                        if not ingredient.is_available or ingredient.pump_id is None:
-                            logger.warning(f"Ingrédient indisponible: {ingredient.name}")
-                            continue
-                        
-                        # Calculer le volume avec multiplicateur final
-                        volume = ingredient.amount_ml * final_multiplier
-                        
-                        step_name = f"Versement {ingredient.name}"
-                        progress = (current_step / total_steps) * 100
-                        self._notify_progress(step_name, progress)
-                        
-                        logger.info(f"  - Versement {volume:.1f}ml de {ingredient.name}")
-                        
-                        # Verser l'ingrédient
-                        success = pump_sys.pour_volume(ingredient.pump_id, volume)
-                        
-                        if not success:
-                            logger.error(f"Échec versement: {ingredient.name}")
-                            self.preparation_status = "error"
+                try:
+                    with pump_operation() as pump_sys:
+                        if pump_sys is None:
+                            logger.error("Système de pompes non disponible")
+                            self._notify_error("Système de pompes non disponible")
                             return False
                         
-                        # Pause entre les ingrédients
-                        await asyncio.sleep(0.5)
-                        current_step += 1
-                    
-                    # Finalisation
-                    self._notify_progress("Finalisation", 95)
+                        # Préparation des ingrédients dans l'ordre optimal
+                        total_steps = len([ing for ing in cocktail.ingredients if ing.category != "garnish"])
+                        current_step = 0
+                        
+                        # Trier les ingrédients par catégorie pour un ordre optimal
+                        sorted_ingredients = sorted(cocktail.ingredients, 
+                                                  key=lambda x: self._get_pour_order(x.category))
+                        
+                        for ingredient in sorted_ingredients:
+                            if ingredient.category == "garnish":
+                                continue
+                            
+                            if not ingredient.is_available or ingredient.pump_id is None:
+                                logger.warning(f"Ingrédient indisponible: {ingredient.name}")
+                                continue
+                            
+                            # Calculer le volume avec multiplicateur final
+                            volume = ingredient.amount_ml * final_multiplier
+                            
+                            step_name = f"Versement {ingredient.name}"
+                            progress = (current_step / total_steps) * 100
+                            self._notify_progress(step_name, progress)
+                            
+                            logger.info(f"  - Versement {volume:.1f}ml de {ingredient.name}")
+                            
+                            # Verser l'ingrédient
+                            success = await pump_sys.pour_volume(ingredient.pump_id, volume)
+                            
+                            if not success:
+                                logger.error(f"Échec versement: {ingredient.name}")
+                                self.preparation_status = "error"
+                                return False
+                            
+                            # Pause entre les ingrédients
+                            await asyncio.sleep(0.5)
+                            current_step += 1
+                        
+                        # Finalisation
+                        self._notify_progress("Finalisation", 95)
                     
                     # Instructions spéciales (mélange, etc.)
                     if cocktail.instructions:
@@ -621,6 +627,11 @@ class CocktailMaker:
                     
                     logger.info(f"[OK] Cocktail préparé avec succès: {cocktail.name}")
                     return True
+                    
+                except (RuntimeError, OSError) as e:
+                    logger.error(f"Erreur système de pompes: {e}")
+                    self._notify_error(f"Système de pompes indisponible: {e}")
+                    return False
         
         except Exception as e:
             logger.error(f"Erreur préparation cocktail: {e}")

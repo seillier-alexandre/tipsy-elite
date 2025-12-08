@@ -1779,9 +1779,12 @@ class ArtDecoInterface:
             self.cocktail_carousel.draw(self.screen)
             
             # Mettre à jour le cocktail sélectionné
-            if (self.cocktail_carousel.selected_index != getattr(self, '_last_selected_index', -1)):
+            if (self.cocktail_carousel and 
+                hasattr(self.cocktail_carousel, 'selected_index') and
+                self.cocktail_carousel.selected_index != getattr(self, '_last_selected_index', -1)):
                 self.update_selected_cocktail()
-                self._last_selected_index = self.cocktail_carousel.selected_index
+                if self.cocktail_carousel:  # Re-vérifier par sécurité
+                    self._last_selected_index = self.cocktail_carousel.selected_index
         
         # Instructions gestuelles (petite aide en bas)
         help_font = self.fonts.get('small')

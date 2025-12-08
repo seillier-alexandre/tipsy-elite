@@ -394,7 +394,7 @@ class PumpManager:
             logger.error(f"Erreur arrêt pompe {pump_id}: {e}")
             return False
     
-    def pour_volume(self, pump_id: int, volume_ml: float, speed_percent: int = 100) -> bool:
+    async def pour_volume(self, pump_id: int, volume_ml: float, speed_percent: int = 100) -> bool:
         """Verse un volume précis avec une pompe"""
         try:
             pump = self.pumps.get(pump_id)
@@ -419,8 +419,9 @@ class PumpManager:
             if not self.start_pump(pump_id, speed_percent):
                 return False
             
-            # Attendre le temps calculé
-            time.sleep(pour_time)
+            # Attendre le temps calculé (non-bloquant)
+            import asyncio
+            await asyncio.sleep(pour_time)
             
             # Arrêter la pompe
             if not self.stop_pump(pump_id):

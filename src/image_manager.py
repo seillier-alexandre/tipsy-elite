@@ -136,22 +136,38 @@ class ImageManager:
                 from PIL import Image
                 import io
                 
+                # Vérifier la taille et validité du fichier
+                import os
+                if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+                    logger.error(f"Fichier inexistant ou vide: {file_path}")
+                    return None
+                
                 # Charger avec PIL et convertir
-                pil_image = Image.open(file_path)
-                
-                # Convertir en RGB si nécessaire
-                if pil_image.mode != 'RGB':
-                    pil_image = pil_image.convert('RGB')
-                
-                # Convertir en format pygame
-                image_string = pil_image.tobytes()
-                surface = pygame.image.fromstring(image_string, pil_image.size, 'RGB')
-                
-                logger.info(f"Image chargée via PIL: {file_path}")
+                with Image.open(file_path) as pil_image:
+                    # Vérifier que l'image est valide
+                    pil_image.verify()
+                    
+                # Recharger après verify (qui ferme l'image)
+                with Image.open(file_path) as pil_image:
+                    # Convertir en RGBA pour gérer la transparence
+                    if pil_image.mode in ('RGBA', 'LA'):
+                        pil_image = pil_image.convert('RGBA')
+                        mode = 'RGBA'
+                    else:
+                        pil_image = pil_image.convert('RGB')
+                        mode = 'RGB'
+                    
+                    # Convertir en format pygame
+                    image_string = pil_image.tobytes()
+                    surface = pygame.image.fromstring(image_string, pil_image.size, mode)
+                    
+                logger.info(f"Image chargée via PIL ({mode}): {file_path}")
                 return surface
                 
             except ImportError:
                 logger.warning("PIL non disponible pour conversion d'image")
+            except (OSError, IOError) as e3:
+                logger.error(f"Fichier image corrompu ou format non supporté {file_path}: {e3}")
             except Exception as e2:
                 logger.warning(f"Chargement PIL échoué pour {file_path}: {e2}")
             

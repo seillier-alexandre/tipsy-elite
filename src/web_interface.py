@@ -1149,9 +1149,28 @@ def prepare_cocktail(cocktail):
     with st.spinner(f"🍹 Préparation en cours..."):
         try:
             if HARDWARE_AVAILABLE:
-                cocktail_manager = get_cocktail_manager()
-                cocktail_id = cocktail.id if hasattr(cocktail, 'id') else cocktail['id']
-                success = asyncio.run(cocktail_manager.maker.prepare_cocktail(cocktail_id))
+                try:
+                    cocktail_manager = get_cocktail_manager()
+                    if not cocktail_manager:
+                        st.error("❌ Gestionnaire de cocktails non disponible")
+                        return
+                    
+                    if not hasattr(cocktail_manager, 'maker') or not cocktail_manager.maker:
+                        st.error("❌ Système de préparation non initialisé")
+                        return
+                    
+                    cocktail_id = cocktail.id if hasattr(cocktail, 'id') else cocktail.get('id', 'unknown')
+                    if not cocktail_id or cocktail_id == 'unknown':
+                        st.error("❌ ID de cocktail invalide")
+                        return
+                    
+                    success = asyncio.run(cocktail_manager.maker.prepare_cocktail(cocktail_id))
+                except (AttributeError, TypeError, KeyError) as e:
+                    st.error(f"❌ Erreur préparation cocktail: {e}")
+                    success = False
+                except Exception as e:
+                    st.error(f"❌ Erreur système: {e}")
+                    success = False
                 if success:
                     st.success(f"✅ {cocktail.name} prêt!")
                 else:

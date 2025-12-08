@@ -424,6 +424,10 @@ class CleaningSystem:
                 logger.info(f"    Application {solution_volume}ml de solution")
                 
                 # Démarrer la pompe de solution
+                if CLEANING_PUMP_CONFIG is None:
+                    logger.error("Configuration pompe de nettoyage non définie")
+                    return False
+                
                 pump_sys.start_pump(CLEANING_PUMP_CONFIG.pump_id, pressure)
                 await asyncio.sleep(solution_volume / CLEANING_PUMP_CONFIG.effective_flow_rate)
                 pump_sys.stop_pump(CLEANING_PUMP_CONFIG.pump_id)
