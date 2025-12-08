@@ -122,6 +122,43 @@ class ImageManager:
         
         self._load_default_images()
     
+    def _load_image_robust(self, file_path: str) -> Optional[pygame.Surface]:
+        """Charge une image avec plusieurs tentatives et formats"""
+        try:
+            # Tentative 1: Chargement direct
+            surface = pygame.image.load(file_path)
+            return surface
+        except Exception as e1:
+            logger.warning(f"Chargement direct échoué pour {file_path}: {e1}")
+            
+            try:
+                # Tentative 2: Conversion avec PIL si disponible
+                from PIL import Image
+                import io
+                
+                # Charger avec PIL et convertir
+                pil_image = Image.open(file_path)
+                
+                # Convertir en RGB si nécessaire
+                if pil_image.mode != 'RGB':
+                    pil_image = pil_image.convert('RGB')
+                
+                # Convertir en format pygame
+                image_string = pil_image.tobytes()
+                surface = pygame.image.fromstring(image_string, pil_image.size, 'RGB')
+                
+                logger.info(f"Image chargée via PIL: {file_path}")
+                return surface
+                
+            except ImportError:
+                logger.warning("PIL non disponible pour conversion d'image")
+            except Exception as e2:
+                logger.warning(f"Chargement PIL échoué pour {file_path}: {e2}")
+            
+            # Si toutes les tentatives échouent
+            logger.error(f"Impossible de charger l'image: {file_path}")
+            return None
+    
     def _load_default_images(self):
         """Charge les images par défaut"""
         default_paths = {
@@ -197,7 +234,10 @@ class ImageManager:
             return self._get_default_image('cocktail', size)
         
         try:
-            surface = pygame.image.load(str(full_path))
+            surface = self._load_image_robust(str(full_path))
+            if surface is None:
+                logger.error(f"Échec chargement image: {full_path}")
+                return self._get_default_image('cocktail', size)
             
             # Redimensionner si nécessaire
             if size is not None:

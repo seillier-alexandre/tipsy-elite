@@ -87,27 +87,31 @@ TB6612_CONTROLLERS: List[TB6612FNGConfig] = [
 
 # Configuration des 12 pompes (6 contrôleurs TB6612)
 PUMP_CONFIGS: List[PumpConfig] = [
-    # Spiritueux de base
-    PumpConfig(1, 0, 'A', 'Vodka', 2.8, 1.0, 750),
-    PumpConfig(2, 0, 'B', 'Gin', 2.8, 1.0, 750),
-    PumpConfig(3, 1, 'A', 'Rhum', 2.8, 1.0, 750),
-    PumpConfig(4, 1, 'B', 'Whisky', 2.8, 1.0, 750),
-    PumpConfig(5, 2, 'A', 'Tequila', 2.8, 1.0, 750),
-    PumpConfig(6, 2, 'B', 'Brandy', 2.8, 1.0, 750),
+    # Spiritueux de base pour cocktails classiques
+    PumpConfig(1, 0, 'A', 'Gin', 2.8, 1.0, 750),
+    PumpConfig(2, 0, 'B', 'Whisky bourbon', 2.8, 1.0, 750),
+    PumpConfig(3, 1, 'A', 'Rhum blanc', 2.8, 1.0, 750),
+    PumpConfig(4, 1, 'B', 'Amaretto', 2.8, 1.0, 750),
+    
+    # Vermouths et liqueurs spécialisées
+    PumpConfig(5, 2, 'A', 'Campari', 2.5, 1.0, 750),
+    PumpConfig(6, 2, 'B', 'Vermouth rouge', 2.5, 1.0, 750),
     
     # Mixers et jus
-    PumpConfig(7, 3, 'A', 'Jus d\'orange', 3.2, 1.0, 1000),
-    PumpConfig(8, 3, 'B', 'Jus de cranberry', 3.2, 1.0, 1000),
-    PumpConfig(9, 4, 'A', 'Sprite', 3.5, 1.0, 1000),
-    PumpConfig(10, 4, 'B', 'Coca Cola', 3.5, 1.0, 1000),
+    PumpConfig(7, 3, 'A', 'Jus de citron frais', 3.2, 1.0, 1000),
+    PumpConfig(8, 3, 'B', 'Jus de citron vert', 3.2, 1.0, 1000),
     
-    # Sirops et liqueurs
-    PumpConfig(11, 5, 'A', 'Triple Sec', 2.5, 1.0, 500),
-    PumpConfig(12, 5, 'B', 'Grenadine', 2.0, 1.0, 500),
+    # Sirops et additifs
+    PumpConfig(9, 4, 'A', 'Sirop simple', 2.0, 1.0, 500),
+    PumpConfig(10, 4, 'B', 'Vermouth blanc sec', 2.5, 1.0, 500),
+    
+    # Liqueurs spéciales et compléments  
+    PumpConfig(11, 5, 'A', 'Liqueur de violette', 1.8, 1.0, 500),
+    PumpConfig(12, 5, 'B', 'Miel', 1.5, 1.0, 500),
 ]
 
 # Pompe de nettoyage dédiée (pompe 12 fait double usage si besoin)
-CLEANING_PUMP_CONFIG = PumpConfig(12, 5, 'B', 'Grenadine/Nettoyage', 2.0, 1.0, 500)
+CLEANING_PUMP_CONFIG = PumpConfig(12, 5, 'B', 'Miel/Nettoyage', 1.5, 1.0, 500)
 
 # Configuration de l'écran tactile rond
 SCREEN_CONFIG = {
