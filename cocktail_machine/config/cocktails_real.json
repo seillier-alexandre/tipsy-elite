@@ -1,0 +1,294 @@
+{
+  "cocktails": [
+    {
+      "id": "gin_tonic",
+      "name": "Gin Tonic",
+      "display_name": "Gin Tonic",
+      "ingredients": [
+        {
+          "name": "Gin",
+          "amount_ml": 50,
+          "pump_id": 1,
+          "category": "spirits",
+          "is_available": true
+        },
+        {
+          "name": "Sprite",
+          "amount_ml": 100,
+          "pump_id": null,
+          "category": "mixers",
+          "is_available": false
+        }
+      ],
+      "description": "Classique rafraîchissant, simple et élégant",
+      "category": "classic",
+      "difficulty": 1,
+      "preparation_time": 60,
+      "glass_type": "highball",
+      "garnish": "Citron vert",
+      "instructions": [
+        "Verser le gin sur glace",
+        "Compléter avec Sprite",
+        "Mélanger délicatement",
+        "Garnir avec citron vert"
+      ],
+      "popularity": 0,
+      "created_at": "2025-12-08T15:22:36.957112",
+      "era": "",
+      "origin": "",
+      "story": "",
+      "alcohol_content": 0.0,
+      "total_volume_ml": 0.0,
+      "cost_estimation": 0.0,
+      "images": {},
+      "taste_profile": {},
+      "mood_tags": [],
+      "weather_tags": [],
+      "occasion_tags": []
+    },
+    {
+      "id": "vodka_cranberry",
+      "name": "Vodka Cranberry",
+      "display_name": "Vodka Cranberry",
+      "ingredients": [
+        {
+          "name": "Vodka",
+          "amount_ml": 45,
+          "pump_id": null,
+          "category": "spirits",
+          "is_available": false
+        },
+        {
+          "name": "Jus de cranberry",
+          "amount_ml": 90,
+          "pump_id": null,
+          "category": "juices",
+          "is_available": false
+        }
+      ],
+      "description": "Cocktail fruité et coloré, parfait à toute heure",
+      "category": "modern",
+      "difficulty": 1,
+      "preparation_time": 60,
+      "glass_type": "rocks",
+      "garnish": "Cranberries",
+      "instructions": [
+        "Mélanger vodka et jus",
+        "Servir sur glace",
+        "Garnir avec cranberries fraîches"
+      ],
+      "popularity": 0,
+      "created_at": "2025-12-08T15:22:36.957191",
+      "era": "",
+      "origin": "",
+      "story": "",
+      "alcohol_content": 0.0,
+      "total_volume_ml": 0.0,
+      "cost_estimation": 0.0,
+      "images": {},
+      "taste_profile": {},
+      "mood_tags": [],
+      "weather_tags": [],
+      "occasion_tags": []
+    },
+    {
+      "id": "rum_cola",
+      "name": "Rum & Cola",
+      "display_name": "Rum & Cola",
+      "ingredients": [
+        {
+          "name": "Rhum",
+          "amount_ml": 50,
+          "pump_id": null,
+          "category": "spirits",
+          "is_available": false
+        },
+        {
+          "name": "Coca Cola",
+          "amount_ml": 120,
+          "pump_id": null,
+          "category": "mixers",
+          "is_available": false
+        }
+      ],
+      "description": "Classique intemporel, Cuba Libre version simple",
+      "category": "classic",
+      "difficulty": 1,
+      "preparation_time": 60,
+      "glass_type": "highball",
+      "garnish": "Citron vert",
+      "instructions": [
+        "Verser le rhum sur glace",
+        "Ajouter le Coca Cola",
+        "Mélanger légèrement",
+        "Garnir avec citron vert"
+      ],
+      "popularity": 0,
+      "created_at": "2025-12-08T15:22:36.957250",
+      "era": "",
+      "origin": "",
+      "story": "",
+      "alcohol_content": 0.0,
+      "total_volume_ml": 0.0,
+      "cost_estimation": 0.0,
+      "images": {},
+      "taste_profile": {},
+      "mood_tags": [],
+      "weather_tags": [],
+      "occasion_tags": []
+    },
+    {
+      "id": "tequila_sunrise",
+      "name": "Tequila Sunrise",
+      "display_name": "Tequila Sunrise",
+      "ingredients": [
+        {
+          "name": "Tequila",
+          "amount_ml": 45,
+          "pump_id": null,
+          "category": "spirits",
+          "is_available": false
+        },
+        {
+          "name": "Jus d'orange",
+          "amount_ml": 90,
+          "pump_id": null,
+          "category": "juices",
+          "is_available": false
+        },
+        {
+          "name": "Grenadine",
+          "amount_ml": 10,
+          "pump_id": null,
+          "category": "syrups",
+          "is_available": false
+        }
+      ],
+      "description": "Magnifique dégradé de couleurs, goût tropical",
+      "category": "tropical",
+      "difficulty": 2,
+      "preparation_time": 60,
+      "glass_type": "highball",
+      "garnish": "Orange et cerise",
+      "instructions": [
+        "Mélanger tequila et jus d'orange",
+        "Ajouter la grenadine lentement",
+        "Observer le dégradé se former",
+        "Garnir avec fruits"
+      ],
+      "popularity": 0,
+      "created_at": "2025-12-08T15:22:36.957333",
+      "era": "",
+      "origin": "",
+      "story": "",
+      "alcohol_content": 0.0,
+      "total_volume_ml": 0.0,
+      "cost_estimation": 0.0,
+      "images": {},
+      "taste_profile": {},
+      "mood_tags": [],
+      "weather_tags": [],
+      "occasion_tags": []
+    },
+    {
+      "id": "whisky_cola",
+      "name": "Whisky Cola",
+      "display_name": "Whisky Cola",
+      "ingredients": [
+        {
+          "name": "Whisky",
+          "amount_ml": 50,
+          "pump_id": null,
+          "category": "spirits",
+          "is_available": false
+        },
+        {
+          "name": "Coca Cola",
+          "amount_ml": 120,
+          "pump_id": null,
+          "category": "mixers",
+          "is_available": false
+        }
+      ],
+      "description": "Jack & Coke version élégante, goût authentique",
+      "category": "classic",
+      "difficulty": 1,
+      "preparation_time": 60,
+      "glass_type": "rocks",
+      "garnish": "Citron",
+      "instructions": [
+        "Verser le whisky sur glace",
+        "Compléter avec Coca Cola",
+        "Remuer délicatement",
+        "Garnir avec citron"
+      ],
+      "popularity": 0,
+      "created_at": "2025-12-08T15:22:36.957385",
+      "era": "",
+      "origin": "",
+      "story": "",
+      "alcohol_content": 0.0,
+      "total_volume_ml": 0.0,
+      "cost_estimation": 0.0,
+      "images": {},
+      "taste_profile": {},
+      "mood_tags": [],
+      "weather_tags": [],
+      "occasion_tags": []
+    },
+    {
+      "id": "brandy_orange",
+      "name": "Brandy Orange",
+      "display_name": "Brandy Orange",
+      "ingredients": [
+        {
+          "name": "Brandy",
+          "amount_ml": 60,
+          "pump_id": null,
+          "category": "spirits",
+          "is_available": false
+        },
+        {
+          "name": "Jus d'orange",
+          "amount_ml": 80,
+          "pump_id": null,
+          "category": "juices",
+          "is_available": false
+        },
+        {
+          "name": "Triple Sec",
+          "amount_ml": 10,
+          "pump_id": null,
+          "category": "spirits",
+          "is_available": false
+        }
+      ],
+      "description": "Sophistiqué et fruité, notes d'agrumes prononcées",
+      "category": "classic",
+      "difficulty": 2,
+      "preparation_time": 60,
+      "glass_type": "coupe",
+      "garnish": "Zeste d'orange",
+      "instructions": [
+        "Mélanger brandy et Triple Sec",
+        "Ajouter le jus d'orange",
+        "Servir dans verre refroidi",
+        "Garnir avec zeste d'orange"
+      ],
+      "popularity": 0,
+      "created_at": "2025-12-08T15:22:36.957467",
+      "era": "",
+      "origin": "",
+      "story": "",
+      "alcohol_content": 0.0,
+      "total_volume_ml": 0.0,
+      "cost_estimation": 0.0,
+      "images": {},
+      "taste_profile": {},
+      "mood_tags": [],
+      "weather_tags": [],
+      "occasion_tags": []
+    }
+  ],
+  "last_updated": "2025-12-08T15:22:36.957549"
+}

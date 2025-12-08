@@ -31,8 +31,12 @@ try:
 except ImportError:
     COCKTAIL_SUPPORT = False
     print("⚠️ Cocktail Manager non disponible en mode démo")
+except Exception as e:
+    COCKTAIL_SUPPORT = False
+    print(f"⚠️ Erreur chargement Cocktail Manager: {e}")
 
-from ..utils.round_display import RoundScreen, DecoTransition
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from utils.round_display import RoundScreen, DecoTransition
 
 class IngredientItem(BoxLayout):
     """Item d'ingrédient avec style Art Déco"""

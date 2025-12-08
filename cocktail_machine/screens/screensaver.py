@@ -20,8 +20,11 @@ from kivy.metrics import dp
 import math
 import time
 import random
+import sys
+import os
 
-from ..utils.round_display import RoundScreen
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from utils.round_display import RoundScreen
 
 class DecoRay(Widget):
     """Rayon Art Déco animé"""
@@ -207,7 +210,7 @@ class ClockDisplay(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(orientation='vertical', **kwargs)
         self.size_hint = (None, None)
-        self.size = (dp(200), dp(100)
+        self.size = (dp(200), dp(100))
         
         # Heure
         self.time_label = Label(

@@ -21,13 +21,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 os.environ['KIVY_WINDOW'] = 'sdl2'
 os.environ['KIVY_GL_BACKEND'] = 'gl'
 
-# Désactiver logs Kivy verbeux en production
+# Désactiver logs Kivy verbeux en production et parsing des arguments
 os.environ['KIVY_LOG_LEVEL'] = 'warning'
+os.environ['KIVY_NO_ARGS'] = '1'
 
 # Import Kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, SlideTransition, FadeTransition
-from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.config import Config
 from kivy.logger import Logger
@@ -36,6 +36,9 @@ from kivy.logger import Logger
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 Config.set('kivy', 'keyboard_mode', 'systemandmulti')
 Config.set('graphics', 'multisamples', '0')  # Désactiver anti-aliasing pour performance
+Config.set('graphics', 'width', '480')
+Config.set('graphics', 'height', '480')
+Config.set('graphics', 'resizable', '1')  # Redimensionnable en mode démo
 
 # Imports locaux
 from screens.menu import MenuScreen
@@ -78,9 +81,9 @@ class CocktailMachineApp(App):
         config.setdefaults('graphics', {
             'width': '480',
             'height': '480',
-            'borderless': '1' if not self.demo_mode else '0',
-            'fullscreen': '1' if not self.demo_mode else '0',
-            'resizable': '0',
+            'borderless': '0' if self.demo_mode else '1',
+            'fullscreen': '0' if self.demo_mode else '1',
+            'resizable': '1' if self.demo_mode else '0',
             'top': '0',
             'left': '0'
         })
@@ -123,52 +126,66 @@ class CocktailMachineApp(App):
     
     def _setup_window(self):
         """Configure la fenêtre selon l'écran rond"""
-        config = ROUND_SCREEN_CONFIG
-        
-        # Taille de fenêtre
-        Window.size = config['resolution']
-        
-        if not self.demo_mode:
-            # Mode production sur Raspberry Pi
-            Window.fullscreen = True
-            Window.borderless = True
-            Window.show_cursor = False
-        else:
-            # Mode développement
-            Window.fullscreen = False
-            Window.borderless = False
-            Window.show_cursor = True
-        
-        # Couleur de fond
-        Window.clearcolor = (0.04, 0.04, 0.04, 1)  # Noir charbon
-        
-        self.logger.info(f"Fenêtre configurée: {Window.size}")
+        try:
+            from kivy.core.window import Window
+            
+            if Window is None:
+                self.logger.warning("⚠️ Window non disponible - configuration ignorée")
+                return
+                
+            config = ROUND_SCREEN_CONFIG
+            
+            # Taille de fenêtre
+            Window.size = config['resolution']
+            
+            if not self.demo_mode:
+                # Mode production sur Raspberry Pi
+                Window.fullscreen = True
+                Window.borderless = True
+                Window.show_cursor = False
+            else:
+                # Mode développement
+                Window.fullscreen = False
+                Window.borderless = False
+                Window.show_cursor = True
+            
+            # Couleur de fond
+            Window.clearcolor = (0.04, 0.04, 0.04, 1)  # Noir charbon
+            
+            self.logger.info(f"Fenêtre configurée: {Window.size}")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Erreur configuration fenêtre: {e}")
     
     def _initialize_systems(self):
         """Initialise les sous-systèmes"""
         try:
             # Initialiser le système de cocktails
-            from cocktail_manager import initialize_cocktail_system
-            if initialize_cocktail_system():
-                self.logger.info("✅ Système cocktails initialisé")
-            else:
-                self.logger.warning("⚠️ Système cocktails en mode dégradé")
+            try:
+                from cocktail_manager import initialize_cocktail_system
+                if initialize_cocktail_system():
+                    self.logger.info("✅ Système cocktails initialisé")
+                else:
+                    self.logger.warning("⚠️ Système cocktails en mode dégradé")
+            except ImportError:
+                self.logger.warning("⚠️ Module cocktail_manager non disponible - mode démo uniquement")
             
             # Initialiser le système de pompes si hardware activé
-            if self.hardware_mode and not self.demo_mode:
+            try:
                 from hardware.pumps import initialize_pump_system
-                try:
-                    initialize_pump_system(use_mock=False)
-                    self.logger.info("✅ Système pompes hardware initialisé")
-                except Exception as e:
-                    self.logger.warning(f"⚠️ Hardware pompes indisponible: {e}")
-                    # Basculer en mode mock
+                if self.hardware_mode and not self.demo_mode:
+                    try:
+                        initialize_pump_system(use_mock=False)
+                        self.logger.info("✅ Système pompes hardware initialisé")
+                    except Exception as e:
+                        self.logger.warning(f"⚠️ Hardware pompes indisponible: {e}")
+                        # Basculer en mode mock
+                        initialize_pump_system(use_mock=True)
+                        self.logger.info("✅ Système pompes mock initialisé")
+                else:
                     initialize_pump_system(use_mock=True)
-                    self.logger.info("✅ Système pompes mock initialisé")
-            elif self.demo_mode:
-                from hardware.pumps import initialize_pump_system
-                initialize_pump_system(use_mock=True)
-                self.logger.info("✅ Système pompes démo initialisé")
+                    self.logger.info("✅ Système pompes démo initialisé")
+            except ImportError:
+                self.logger.warning("⚠️ Module pumps non disponible - mode démo uniquement")
             
         except ImportError as e:
             self.logger.warning(f"⚠️ Modules hardware non disponibles: {e}")
@@ -206,30 +223,36 @@ class CocktailMachineApp(App):
     
     def _setup_screensaver(self):
         """Configure l'économiseur d'écran"""
-        # Délai d'inactivité (5 minutes par défaut)
-        inactivity_timeout = 300
-        
-        if self.demo_mode:
-            inactivity_timeout = 60  # 1 minute en mode démo
-        
-        def reset_screensaver(*args):
-            """Remet le timer de l'économiseur à zéro"""
-            if self.screensaver_event:
-                self.screensaver_event.cancel()
+        try:
+            from kivy.core.window import Window
             
-            if self.screen_manager.current != 'screensaver':
-                self.screensaver_event = activate_screensaver_after_delay(
-                    self.screen_manager, inactivity_timeout
-                )
-        
-        # Touch ou touche remet le timer à zéro
-        Window.bind(on_touch_down=reset_screensaver)
-        Window.bind(on_key_down=reset_screensaver)
-        
-        # Démarrer le timer initial
-        reset_screensaver()
-        
-        self.logger.info(f"Économiseur configuré: {inactivity_timeout}s d'inactivité")
+            # Délai d'inactivité (5 minutes par défaut)
+            inactivity_timeout = 300
+            
+            if self.demo_mode:
+                inactivity_timeout = 60  # 1 minute en mode démo
+            
+            def reset_screensaver(*args):
+                """Remet le timer de l'économiseur à zéro"""
+                if self.screensaver_event:
+                    self.screensaver_event.cancel()
+                
+                if self.screen_manager.current != 'screensaver':
+                    self.screensaver_event = activate_screensaver_after_delay(
+                        self.screen_manager, inactivity_timeout
+                    )
+            
+            # Touch ou touche remet le timer à zéro
+            if Window:
+                Window.bind(on_touch_down=reset_screensaver)
+                Window.bind(on_key_down=reset_screensaver)
+            
+            # Démarrer le timer initial
+            reset_screensaver()
+            
+            self.logger.info(f"Économiseur configuré: {inactivity_timeout}s d'inactivité")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Erreur configuration économiseur: {e}")
     
     def _setup_event_handlers(self):
         """Configure les gestionnaires d'événements globaux"""
@@ -258,7 +281,12 @@ class CocktailMachineApp(App):
                 return True
             elif key == 'f11':
                 # F11 pour basculer plein écran
-                Window.fullscreen = not Window.fullscreen
+                try:
+                    from kivy.core.window import Window
+                    if Window:
+                        Window.fullscreen = not Window.fullscreen
+                except:
+                    pass
                 return True
             elif key == 's' and 'ctrl' in [k for k in args[2]]:
                 # Ctrl+S pour forcer économiseur
@@ -267,7 +295,12 @@ class CocktailMachineApp(App):
             
             return False
         
-        Window.bind(on_key_down=on_key_down)
+        try:
+            from kivy.core.window import Window
+            if Window:
+                Window.bind(on_key_down=on_key_down)
+        except:
+            pass
     
     def on_start(self):
         """Appelé au démarrage de l'application"""

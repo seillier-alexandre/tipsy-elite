@@ -32,8 +32,12 @@ try:
 except ImportError:
     PUMP_SUPPORT = False
     print("⚠️ Système pompes non disponible en mode démo")
+except Exception as e:
+    PUMP_SUPPORT = False
+    print(f"⚠️ Erreur chargement système pompes: {e}")
 
-from ..utils.round_display import RoundScreen, DecoTransition
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from utils.round_display import RoundScreen, DecoTransition
 
 class PumpCleaningItem(BoxLayout):
     """Widget de nettoyage individuel par pompe"""
