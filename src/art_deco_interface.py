@@ -1229,6 +1229,9 @@ class ArtDecoInterface:
         self.settings_panel = SettingsPanel(self.fonts)
         self.serve_button = None
         
+        # Boutons retour pour chaque écran
+        self.back_buttons = {}
+        
         # État des panels
         self.ingredient_panel_visible = False
         self.settings_panel_visible = False
@@ -1382,6 +1385,34 @@ class ArtDecoInterface:
         
         # Enregistrer les callbacks de gestes
         self.register_gesture_callbacks()
+        
+        # Créer les boutons retour
+        self._setup_back_buttons()
+    
+    def _setup_back_buttons(self):
+        """Crée les boutons retour pour chaque écran"""
+        back_button_width = 120
+        back_button_height = 40
+        back_button_x = CENTER_X - back_button_width // 2
+        back_button_y = SCREEN_HEIGHT - back_button_height - 30
+        
+        # Bouton retour pour écran cocktails
+        self.back_buttons['cocktail_menu'] = ArtDecoButton(
+            back_button_x, back_button_y, back_button_width, back_button_height,
+            "RETOUR", lambda: self.switch_screen("main_menu")
+        )
+        
+        # Bouton retour pour écran nettoyage
+        self.back_buttons['cleaning'] = ArtDecoButton(
+            back_button_x, back_button_y, back_button_width, back_button_height,
+            "RETOUR", lambda: self.switch_screen("main_menu")
+        )
+        
+        # Bouton retour pour écran paramètres
+        self.back_buttons['settings'] = ArtDecoButton(
+            back_button_x, back_button_y, back_button_width, back_button_height,
+            "RETOUR", lambda: self.switch_screen("main_menu")
+        )
     
     def draw_splash_screen(self):
         """Dessine l'écran de démarrage"""
@@ -1705,6 +1736,23 @@ class ArtDecoInterface:
                         self.selected_cocktail.get('is_makeable', False)):
                         if self.serve_button.handle_event(event):
                             break
+                    
+                    # Gestion du bouton retour
+                    if 'cocktail_menu' in self.back_buttons:
+                        if self.back_buttons['cocktail_menu'].handle_event(event):
+                            break
+                
+                elif self.current_screen == "cleaning":
+                    # Gestion du bouton retour
+                    if 'cleaning' in self.back_buttons:
+                        if self.back_buttons['cleaning'].handle_event(event):
+                            break
+                
+                elif self.current_screen == "settings":
+                    # Gestion du bouton retour
+                    if 'settings' in self.back_buttons:
+                        if self.back_buttons['settings'].handle_event(event):
+                            break
                 
                 elif self.current_screen == "splash":
                     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1815,10 +1863,9 @@ class ArtDecoInterface:
         if self.settings_panel_visible:
             self.settings_panel.draw(self.screen)
         
-        # Bouton retour en haut à gauche
-        back_button = ArtDecoButton(30, 30, 100, 35, "RETOUR", 
-                                   lambda: self.switch_screen("main_menu"))
-        back_button.draw(self.screen, self.fonts)
+        # Bouton retour centré en bas
+        if 'cocktail_menu' in self.back_buttons:
+            self.back_buttons['cocktail_menu'].draw(self.screen, self.fonts)
     
     def draw_cleaning_screen(self):
         """Dessine l'écran de nettoyage"""
@@ -1838,10 +1885,10 @@ class ArtDecoInterface:
         msg_rect = msg_surface.get_rect(center=(CENTER_X, CENTER_Y))
         self.screen.blit(msg_surface, msg_rect)
         
-        # Bouton retour
-        back_button = ArtDecoButton(50, 50, 120, 40, "RETOUR", 
-                                   lambda: self.switch_screen("main_menu"))
-        back_button.draw(self.screen, self.fonts)
+        # Bouton retour centré en bas
+        screen_key = self.current_screen if self.current_screen in self.back_buttons else 'cleaning'
+        if screen_key in self.back_buttons:
+            self.back_buttons[screen_key].draw(self.screen, self.fonts)
     
     def draw_settings_screen(self):
         """Dessine l'écran des paramètres"""
@@ -1861,10 +1908,10 @@ class ArtDecoInterface:
         msg_rect = msg_surface.get_rect(center=(CENTER_X, CENTER_Y))
         self.screen.blit(msg_surface, msg_rect)
         
-        # Bouton retour
-        back_button = ArtDecoButton(50, 50, 120, 40, "RETOUR", 
-                                   lambda: self.switch_screen("main_menu"))
-        back_button.draw(self.screen, self.fonts)
+        # Bouton retour centré en bas
+        screen_key = self.current_screen if self.current_screen in self.back_buttons else 'cleaning'
+        if screen_key in self.back_buttons:
+            self.back_buttons[screen_key].draw(self.screen, self.fonts)
     
     def cleanup(self):
         """Nettoie les ressources"""
