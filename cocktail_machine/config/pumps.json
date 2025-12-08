@@ -1,0 +1,118 @@
+{
+  "pumps": {
+    "pump_1": {
+      "pwm_pin": 18,
+      "in1_pin": 22,
+      "in2_pin": 23,
+      "ingredient": "Gin",
+      "flow_rate_ml_s": 2.5,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1000.0
+    },
+    "pump_2": {
+      "pwm_pin": 19,
+      "in1_pin": 24,
+      "in2_pin": 25,
+      "ingredient": "Vodka",
+      "flow_rate_ml_s": 2.5,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1000.0
+    },
+    "pump_3": {
+      "pwm_pin": 13,
+      "in1_pin": 5,
+      "in2_pin": 6,
+      "ingredient": "Rhum",
+      "flow_rate_ml_s": 2.5,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1000.0
+    },
+    "pump_4": {
+      "pwm_pin": 12,
+      "in1_pin": 16,
+      "in2_pin": 20,
+      "ingredient": "Whisky",
+      "flow_rate_ml_s": 2.5,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1000.0
+    },
+    "pump_5": {
+      "pwm_pin": 4,
+      "in1_pin": 17,
+      "in2_pin": 27,
+      "ingredient": "Tequila",
+      "flow_rate_ml_s": 2.5,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1000.0
+    },
+    "pump_6": {
+      "pwm_pin": 21,
+      "in1_pin": 26,
+      "in2_pin": 19,
+      "ingredient": "Brandy",
+      "flow_rate_ml_s": 2.5,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1000.0
+    },
+    "pump_7": {
+      "pwm_pin": 15,
+      "in1_pin": 14,
+      "in2_pin": 2,
+      "ingredient": "Sprite",
+      "flow_rate_ml_s": 3.0,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 2000.0
+    },
+    "pump_8": {
+      "pwm_pin": 3,
+      "in1_pin": 9,
+      "in2_pin": 10,
+      "ingredient": "Coca Cola",
+      "flow_rate_ml_s": 3.0,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 2000.0
+    },
+    "pump_9": {
+      "pwm_pin": 11,
+      "in1_pin": 8,
+      "in2_pin": 7,
+      "ingredient": "Jus d'orange",
+      "flow_rate_ml_s": 3.0,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 1500.0
+    },
+    "pump_10": {
+      "pwm_pin": 1,
+      "in1_pin": 0,
+      "in2_pin": 28,
+      "ingredient": "Grenadine",
+      "flow_rate_ml_s": 2.0,
+      "calibration_factor": 1.0,
+      "enabled": true,
+      "max_volume_ml": 500.0
+    }
+  },
+  "hardware_config": {
+    "gpio_mode": "BCM",
+    "pwm_frequency": 1000,
+    "default_speed": 80,
+    "emergency_timeout": 10,
+    "max_pump_time": 60
+  },
+  "safety": {
+    "max_volume_per_cocktail": 300.0,
+    "max_alcohol_per_cocktail": 150.0,
+    "pump_timeout": 30.0,
+    "emergency_stop_pins": [31, 33]
+  },
+  "last_updated": "2024-12-08T12:00:00"
+}

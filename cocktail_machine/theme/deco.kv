@@ -1,0 +1,166 @@
+#:kivy 2.0
+
+# ═══════════════════════════════════════════════════════════════
+# THÈME ART DÉCO ANNÉES 1920 - MACHINE À COCKTAIL
+# ═══════════════════════════════════════════════════════════════
+
+# Couleurs globales
+#:set DECO_BLACK '#0A0A0A'
+#:set DECO_GOLD '#D4AF37'  
+#:set DECO_CREAM '#F7F4E9'
+#:set DECO_EMERALD '#064E4E'
+#:set DECO_BRONZE '#B8860B'
+
+<DecoButton@Button>:
+    background_normal: ''
+    background_color: 0, 0, 0, 0
+    canvas.before:
+        Color:
+            rgba: 0.04, 0.04, 0.04, 1  # DECO_BLACK
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15]
+        
+        Color:
+            rgba: 0.83, 0.69, 0.22, 1  # DECO_GOLD
+        Line:
+            rounded_rectangle: self.x, self.y, self.width, self.height, 15
+            width: 3
+        
+        # Motif Art Déco - coins dorés
+        Color:
+            rgba: 0.83, 0.69, 0.22, 0.8
+        Line:
+            points: self.x + 20, self.y + 20, self.x + 40, self.y + 20, self.x + 30, self.y + 30
+            width: 2
+        Line:
+            points: self.right - 40, self.y + 20, self.right - 20, self.y + 20, self.right - 30, self.y + 30
+            width: 2
+        Line:
+            points: self.x + 20, self.top - 20, self.x + 40, self.top - 20, self.x + 30, self.top - 30
+            width: 2
+        Line:
+            points: self.right - 40, self.top - 20, self.right - 20, self.top - 20, self.right - 30, self.top - 30
+            width: 2
+    
+    color: 0.97, 0.96, 0.91, 1  # DECO_CREAM
+    font_size: '18sp'
+    bold: True
+
+<DecoTitle@Label>:
+    color: 0.83, 0.69, 0.22, 1  # DECO_GOLD
+    font_size: '32sp'
+    bold: True
+    halign: 'center'
+    canvas.before:
+        # Sunburst derrière le titre
+        Color:
+            rgba: 0.83, 0.69, 0.22, 0.2
+        Line:
+            points: self.center_x, self.center_y, self.center_x - 50, self.center_y + 30
+            width: 1
+        Line:
+            points: self.center_x, self.center_y, self.center_x + 50, self.center_y + 30
+            width: 1
+        Line:
+            points: self.center_x, self.center_y, self.center_x - 30, self.center_y - 40
+            width: 1
+        Line:
+            points: self.center_x, self.center_y, self.center_x + 30, self.center_y - 40
+            width: 1
+
+<DecoPanel@BoxLayout>:
+    canvas.before:
+        Color:
+            rgba: 0.04, 0.04, 0.04, 0.95  # DECO_BLACK semi-transparent
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20]
+        
+        Color:
+            rgba: 0.83, 0.69, 0.22, 1  # DECO_GOLD
+        Line:
+            rounded_rectangle: self.x, self.y, self.width, self.height, 20
+            width: 2
+        
+        # Motifs géométriques Art Déco
+        Color:
+            rgba: 0.83, 0.69, 0.22, 0.3
+        Line:
+            points: self.x + 30, self.top - 30, self.right - 30, self.top - 30
+            width: 1
+        Line:
+            points: self.x + 50, self.top - 50, self.right - 50, self.top - 50
+            width: 1
+
+<CircleLayout@FloatLayout>:
+    canvas.before:
+        # Masque circulaire
+        StencilPush
+        Ellipse:
+            pos: self.center_x - min(self.width, self.height)/2, self.center_y - min(self.width, self.height)/2
+            size: min(self.width, self.height), min(self.width, self.height)
+        StencilUse
+    canvas.after:
+        StencilUnUse
+        StencilPop
+        
+        # Bordure dorée du cercle
+        Color:
+            rgba: 0.83, 0.69, 0.22, 0.8
+        Line:
+            ellipse: self.center_x - min(self.width, self.height)/2, self.center_y - min(self.width, self.height)/2, min(self.width, self.height), min(self.width, self.height)
+            width: 4
+
+<DecoSlider@Slider>:
+    canvas.before:
+        Color:
+            rgba: 0.83, 0.69, 0.22, 0.5
+        Rectangle:
+            pos: self.x, self.center_y - 2
+            size: self.width, 4
+    cursor_image: ''
+    cursor_size: 20, 20
+    canvas.after:
+        Color:
+            rgba: 0.83, 0.69, 0.22, 1
+        Ellipse:
+            pos: self.cursor_pos[0] - 10, self.cursor_pos[1] - 10
+            size: 20, 20
+
+<SunburstAnimation@Widget>:
+    canvas:
+        PushMatrix
+        Rotate:
+            angle: self.angle if hasattr(self, 'angle') else 0
+            origin: self.center
+        Color:
+            rgba: 0.83, 0.69, 0.22, 0.3
+        # Rayons dorés
+        Line:
+            points: self.center_x, self.center_y, self.center_x, self.center_y + 100
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x + 70, self.center_y + 70
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x + 100, self.center_y
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x + 70, self.center_y - 70
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x, self.center_y - 100
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x - 70, self.center_y - 70
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x - 100, self.center_y
+            width: 2
+        Line:
+            points: self.center_x, self.center_y, self.center_x - 70, self.center_y + 70
+            width: 2
+        PopMatrix

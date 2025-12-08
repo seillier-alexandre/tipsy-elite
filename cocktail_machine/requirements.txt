@@ -1,0 +1,36 @@
+# Machine à Cocktails Art Déco - Dépendances Python
+
+# Framework Kivy principal
+kivy>=2.1.0
+
+# Support GPIO Raspberry Pi
+RPi.GPIO>=0.7.1
+
+# Traitement d'images (fallback)
+Pillow>=9.0.0
+
+# Gestion JSON avancée  
+jsonschema>=4.0.0
+
+# Logging amélioré
+coloredlogs>=15.0.1
+
+# Gestion configurations
+configparser>=5.3.0
+
+# Date/temps
+python-dateutil>=2.8.2
+
+# Async/await support
+asyncio-mqtt>=0.10.0
+
+# Monitoring système (optionnel)
+psutil>=5.9.0
+
+# Tests et développement
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Documentation
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.2.0
