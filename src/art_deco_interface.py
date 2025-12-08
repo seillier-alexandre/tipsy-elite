@@ -809,6 +809,7 @@ class CocktailCarousel:
         self.cocktails = cocktails
         self.fonts = fonts
         self.current_index = 0
+        self.selected_index = 0  # Alias pour compatibilité
         self.scroll_offset = 0.0
         self.target_offset = 0.0
         self.is_animating = False
@@ -819,6 +820,7 @@ class CocktailCarousel:
         """Passe au cocktail suivant"""
         if self.current_index < len(self.cocktails) - 1:
             self.current_index += 1
+            self.selected_index = self.current_index  # Synchroniser
             self.target_offset = -self.current_index * self.card_width
             self.is_animating = True
     
@@ -826,6 +828,7 @@ class CocktailCarousel:
         """Passe au cocktail précédent"""
         if self.current_index > 0:
             self.current_index -= 1
+            self.selected_index = self.current_index  # Synchroniser
             self.target_offset = -self.current_index * self.card_width
             self.is_animating = True
     
