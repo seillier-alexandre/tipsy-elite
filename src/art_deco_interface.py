@@ -906,11 +906,11 @@ class CocktailCarousel:
     
     def _draw_cocktail_image(self, surface, cocktail, scale):
         """Dessine l'image du cocktail"""
-        # Zone image
-        img_width = int(300 * scale)
-        img_height = int(300 * scale)
+        # Zone image - format rectangulaire plus naturel
+        img_width = int(350 * scale)  # Légèrement plus large
+        img_height = int(250 * scale)  # Format plus rectangulaire
         img_x = (int(self.card_width * scale) - img_width) // 2
-        img_y = int(80 * scale)
+        img_y = int(60 * scale)  # Plus haut pour compenser la hauteur réduite
         
         # Charger la vraie image du cocktail
         cocktail_image = None
@@ -927,53 +927,38 @@ class CocktailCarousel:
                 logger.debug(f"Image chargée pour {cocktail_id}: {cocktail_image is not None}")
                 
                 if cocktail_image is not None:
-                    # Créer un masque circulaire pour l'image
-                    mask_surface = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
-                    pygame.draw.ellipse(mask_surface, (255, 255, 255, 255), (0, 0, img_width, img_height))
-                    
-                    # Appliquer le masque à l'image
-                    masked_image = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
-                    masked_image.blit(cocktail_image, (0, 0))
-                    masked_image.blit(mask_surface, (0, 0), special_flags=pygame.BLEND_ALPHA_SDL2)
-                    
-                    # Dessiner l'image masquée
-                    surface.blit(masked_image, (img_x, img_y))
-                    
-                    # Bordure dorée autour
-                    pygame.draw.ellipse(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=3)
-                    pygame.draw.ellipse(surface, Colors.BRONZE, (img_x-5, img_y-5, img_width+10, img_height+10), width=1)
-                    
-                    # Reflet style verre par-dessus
-                    highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
-                    highlight.fill((*Colors.CREAM, 40))
-                    surface.blit(highlight, (img_x + img_width//4, img_y + img_height//6))
-                    
+                    # Afficher l'image directement - pure et belle !
+                    surface.blit(cocktail_image, (img_x, img_y))
                     return  # Image chargée avec succès
         
         except Exception as e:
             logger.debug(f"Erreur chargement image cocktail {cocktail.get('id', 'inconnu')}: {e}")
         
-        # Fallback : fond coloré temporaire si image non disponible
+        # Fallback : fond coloré rectangulaire si image non disponible
         logger.debug(f"Affichage fallback pour cocktail {cocktail.get('name', 'inconnu')}")
         img_color = self._get_cocktail_color(cocktail)
         
-        # Fond coloré
-        pygame.draw.ellipse(surface, img_color, (img_x, img_y, img_width, img_height))
+        # Fond coloré rectangulaire
+        pygame.draw.rect(surface, img_color, (img_x, img_y, img_width, img_height))
         
-        # Bordures décoratives
-        pygame.draw.ellipse(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=3)
-        pygame.draw.ellipse(surface, Colors.BRONZE, (img_x-5, img_y-5, img_width+10, img_height+10), width=1)
+        # Bordure dorée
+        pygame.draw.rect(surface, Colors.GOLD, (img_x-2, img_y-2, img_width+4, img_height+4), width=2)
         
         # Icône cocktail au centre
-        icon_size = int(80 * scale)
+        icon_size = int(60 * scale)
         icon_x = img_x + (img_width - icon_size) // 2
         icon_y = img_y + (img_height - icon_size) // 2
         
         # Dessiner un verre stylisé
         glass_color = Colors.CREAM
-        pygame.draw.ellipse(surface, glass_color, (icon_x + icon_size//4, icon_y + icon_size//3, icon_size//2, icon_size//3), width=3)
-        pygame.draw.line(surface, glass_color, (icon_x + icon_size//2, icon_y + icon_size//3 + icon_size//3), 
-                        (icon_x + icon_size//2, icon_y + icon_size - 5), width=2)
+        # Coupe du verre
+        pygame.draw.ellipse(surface, glass_color, (icon_x + icon_size//4, icon_y + icon_size//3, icon_size//2, icon_size//4), width=3)
+        # Pied du verre
+        pygame.draw.line(surface, glass_color, (icon_x + icon_size//2, icon_y + icon_size//3 + icon_size//4), 
+                        (icon_x + icon_size//2, icon_y + icon_size - 8), width=2)
+        # Base du verre
+        pygame.draw.line(surface, glass_color, (icon_x + icon_size//3, icon_y + icon_size - 8), 
+                        (icon_x + 2*icon_size//3, icon_y + icon_size - 8), width=3)
         
         # Reflet style verre
         highlight = pygame.Surface((img_width//2, img_height//3), pygame.SRCALPHA)
