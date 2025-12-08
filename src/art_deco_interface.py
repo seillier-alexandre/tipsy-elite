@@ -1043,6 +1043,12 @@ class IngredientPanel:
         """Cache le panel"""
         self.visible = False
         self.target_offset = SCREEN_HEIGHT
+    
+    def set_ingredients(self, ingredients):
+        """Met à jour les ingrédients"""
+        if self.cocktail is None:
+            self.cocktail = {}
+        self.cocktail['ingredients'] = ingredients
         
     def update(self):
         """Met à jour l'animation"""
@@ -1653,13 +1659,19 @@ class ArtDecoInterface:
                             click_pos = event.pos
                             panel_clicked = False
                             
-                            if (self.ingredient_panel_visible and 
-                                self.ingredient_panel.rect.collidepoint(click_pos)):
-                                panel_clicked = True
+                            if self.ingredient_panel_visible:
+                                # Créer un rect temporaire pour le panel
+                                panel_rect = pygame.Rect(0, self.ingredient_panel.slide_offset, 
+                                                       SCREEN_WIDTH, SCREEN_HEIGHT - self.ingredient_panel.slide_offset)
+                                if panel_rect.collidepoint(click_pos):
+                                    panel_clicked = True
                             
-                            if (self.settings_panel_visible and 
-                                self.settings_panel.rect.collidepoint(click_pos)):
-                                panel_clicked = True
+                            if self.settings_panel_visible:
+                                # Créer un rect temporaire pour le panel  
+                                panel_rect = pygame.Rect(0, self.settings_panel.slide_offset,
+                                                       SCREEN_WIDTH, SCREEN_HEIGHT + self.settings_panel.slide_offset)
+                                if panel_rect.collidepoint(click_pos):
+                                    panel_clicked = True
                             
                             if not panel_clicked:
                                 self.hide_panels()
