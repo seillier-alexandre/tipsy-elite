@@ -311,9 +311,15 @@ class PumpManager:
                     self.is_initialized = True
                     logger.info(f"[OK] Tous les contrôleurs TB6612 initialisés ({success_count}/{len(self.controllers)})")
                     return True
+                elif success_count > 0:
+                    self.is_initialized = True
+                    logger.warning(f"[PARTIAL] Contrôleurs TB6612 partiellement initialisés ({success_count}/{len(self.controllers)})")
+                    return True
                 else:
-                    logger.error(f"[ERROR] Échec initialisation: {success_count}/{len(self.controllers)} contrôleurs")
-                    return False
+                    # Aucun contrôleur réel, mais continuer en mode simulation
+                    self.is_initialized = True
+                    logger.warning(f"[SIMULATION] Mode simulation - aucun contrôleur hardware détecté")
+                    return True
                     
         except Exception as e:
             logger.error(f"Erreur initialisation PumpManager: {e}")

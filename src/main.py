@@ -50,12 +50,13 @@ except ImportError as e:
 class TipsySystem:
     """Système principal de la machine à cocktails"""
     
-    def __init__(self):
+    def __init__(self, force_hardware: bool = False):
         self.interface: ArtDecoInterface = None
         self.cocktail_manager = None
         self.cleaning_system = None
         self.running = False
         self.cleanup_done = False
+        self.force_hardware = force_hardware
         
         # Thread pour l'interface
         self.interface_thread = None
@@ -81,9 +82,13 @@ class TipsySystem:
         # 2. Initialisation du système de pompes
         logger.info("[INIT] Initialisation système de pompes...")
         if not initialize_pump_system():
-            logger.error("[ERROR] Échec initialisation pompes")
-            return False
-        logger.info("[OK] Système de pompes initialisé")
+            if self.force_hardware:
+                logger.error("[ERROR] Échec initialisation pompes (mode force-hardware)")
+                return False
+            else:
+                logger.warning("[WARNING] Pompes non disponibles - Continuer en mode interface")
+        else:
+            logger.info("[OK] Système de pompes initialisé")
         
         # 3. Initialisation du système de cocktails
         logger.info("[INIT] Initialisation système de cocktails...")
@@ -454,6 +459,10 @@ def main():
                        help="Lance uniquement l'interface web")
     parser.add_argument("--pygame-only", action="store_true",
                        help="Lance uniquement l'interface tactile")
+    parser.add_argument("--interface-only", action="store_true",
+                       help="Lance l'interface complète sans forcer l'hardware")
+    parser.add_argument("--force-hardware", action="store_true",
+                       help="Force l'initialisation hardware (échec si indisponible)")
     parser.add_argument("--debug", action="store_true",
                        help="Active le mode debug")
     
@@ -498,12 +507,22 @@ def main():
             current_system = demo
             demo.run()
         else:
-            system = TipsySystem()
+            system = TipsySystem(force_hardware=args.force_hardware)
             current_system = system
             if args.async_mode:
                 system.run_async()
             else:
                 system.run()
+                
+    elif args.interface_only:
+        # Interface complète sans forcer hardware
+        logger.info("Démarrage interface complète (hardware optionnel)")
+        system = TipsySystem(force_hardware=False)
+        current_system = system
+        if args.async_mode:
+            system.run_async()
+        else:
+            system.run()
                 
     elif args.multi_process:
         # Mode multi-process
@@ -518,8 +537,8 @@ def main():
         current_system = demo
         demo.run()
     else:
-        # Mode standard
-        system = TipsySystem()
+        # Mode standard (hardware si disponible)
+        system = TipsySystem(force_hardware=args.force_hardware)
         current_system = system
         
         # Démarrage
