@@ -1281,11 +1281,18 @@ class ArtDecoInterface:
         """Charge les cocktails depuis le gestionnaire de cocktails"""
         try:
             # Importer le gestionnaire de cocktails
-            from cocktail_manager import get_cocktail_manager
-            cocktail_manager = get_cocktail_manager()
+            try:
+                from cocktail_manager import get_cocktail_manager
+                cocktail_manager = get_cocktail_manager()
+                if not cocktail_manager:
+                    raise ImportError("Gestionnaire cocktails non disponible")
+            except (ImportError, AttributeError) as e:
+                logger.error(f"Mode démo - gestionnaire cocktails non disponible: {e}")
+                self.show_status_message("Mode démo - Préparation simulée", "info")
+                return
             
             # Charger les cocktails réalisables
-            recipes = cocktail_manager.database.get_makeable_cocktails()
+            recipes = cocktail_manager.database.get_makeable_cocktails() if cocktail_manager and cocktail_manager.database else []
             
             self.cocktails = []
             for recipe in recipes:
@@ -1599,8 +1606,15 @@ class ArtDecoInterface:
         
         try:
             # Importer le gestionnaire de cocktails
-            from cocktail_manager import get_cocktail_manager
-            cocktail_manager = get_cocktail_manager()
+            try:
+                from cocktail_manager import get_cocktail_manager
+                cocktail_manager = get_cocktail_manager()
+                if not cocktail_manager:
+                    raise ImportError("Gestionnaire cocktails non disponible")
+            except (ImportError, AttributeError) as e:
+                logger.error(f"Mode démo - gestionnaire cocktails non disponible: {e}")
+                self.show_status_message("Mode démo - Préparation simulée", "info")
+                return
             
             cocktail_id = self.selected_cocktail.get('id')
             if cocktail_id:

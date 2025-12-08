@@ -11,6 +11,9 @@ from typing import Dict, Optional
 from contextlib import contextmanager
 from dataclasses import dataclass
 
+# Logger défini tôt pour éviter les erreurs
+logger = logging.getLogger(__name__)
+
 # Imports optionnels pour gestion signaux
 try:
     import signal
@@ -19,7 +22,6 @@ try:
     SIGNAL_SUPPORT = True
 except ImportError:
     SIGNAL_SUPPORT = False
-    logger = logging.getLogger(__name__)
     logger.warning("Modules signal/atexit/sys non disponibles")
 
 try:

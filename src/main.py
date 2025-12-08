@@ -206,7 +206,10 @@ class TipsySystem:
                 logger.info(f"[MAINTENANCE] Maintenance recommandée: {mode}")
                 
                 # Ne pas démarrer automatiquement le nettoyage pendant une préparation
-                if self.cocktail_manager.maker.preparation_status != "preparing":
+                if (self.cocktail_manager and 
+                    hasattr(self.cocktail_manager, 'maker') and 
+                    self.cocktail_manager.maker and
+                    getattr(self.cocktail_manager.maker, 'preparation_status', 'idle') != "preparing"):
                     # Programmer le nettoyage selon le mode
                     if mode == "quick":
                         logger.info("Démarrage nettoyage rapide automatique")

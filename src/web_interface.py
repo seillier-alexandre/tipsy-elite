@@ -274,7 +274,7 @@ def dashboard_page():
         if HARDWARE_AVAILABLE:
             try:
                 cocktail_manager = get_cocktail_manager()
-                makeable_count = len(cocktail_manager.database.get_makeable_cocktails())
+                makeable_count = len(cocktail_manager.database.get_makeable_cocktails()) if cocktail_manager and cocktail_manager.database else 0
             except:
                 makeable_count = 0
         else:
@@ -489,7 +489,7 @@ def cocktail_management_page():
         if HARDWARE_AVAILABLE:
             try:
                 cocktail_manager = get_cocktail_manager()
-                cocktails = cocktail_manager.database.get_makeable_cocktails()
+                cocktails = cocktail_manager.database.get_makeable_cocktails() if cocktail_manager and cocktail_manager.database else []
             except:
                 cocktails = []
         else:

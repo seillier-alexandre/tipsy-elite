@@ -325,7 +325,7 @@ class FavoritesManager:
             from cocktail_manager import get_cocktail_manager
             
             cocktail_manager = get_cocktail_manager()
-            all_cocktails = cocktail_manager.database.get_all_cocktails()
+            all_cocktails = cocktail_manager.database.get_all_cocktails() if cocktail_manager and cocktail_manager.database else []
             favorite_ids = self.get_favorite_ids()
             
             if not favorite_ids:
